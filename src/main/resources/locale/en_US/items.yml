@@ -19,6 +19,9 @@ fireball:
     #Enable this?
     enabled: true
 
+    #Flying speed
+    speed: 6
+
     #Ejection velocity
     velocity: 0.5
     

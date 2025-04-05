@@ -8,19 +8,10 @@ import me.ram.bedwarsitemaddon.config.LocaleConfig;
 import me.ram.bedwarsitemaddon.items.*;
 import me.ram.bedwarsitemaddon.listener.EventListener;
 import me.ram.bedwarsitemaddon.manage.NoFallManage;
-import me.ram.bedwarsitemaddon.network.UpdateCheck;
 import org.bstats.metrics.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.List;
 
 /**
  * @author Ram
@@ -35,9 +26,9 @@ public class Main extends JavaPlugin {
     @Getter
     private LocaleConfig localeConfig;
 
-    public static String getVersion() {
-        return "1.7.0";
-    }
+//    public static String getVersion() {
+//        return "1.7.0";
+//    }
 
     @Override
     public FileConfiguration getConfig() {
@@ -46,6 +37,7 @@ public class Main extends JavaPlugin {
     }
 
     public void onEnable() {
+        // 实在懒得改版本号 ==
 //        if (!getDescription().getName().equals("BedwarsItemAddon") || !getDescription().getVersion().equals(getVersion()) || !getDescription().getAuthors().contains("Ram")) {
 //            try {
 //                new Exception("Please don't edit plugin.yml!").printStackTrace();
@@ -62,7 +54,7 @@ public class Main extends JavaPlugin {
         Bukkit.getConsoleSender().sendMessage("§7");
         Bukkit.getConsoleSender().sendMessage("            §bBedwarsItemAddon");
         Bukkit.getConsoleSender().sendMessage("§7");
-        Bukkit.getConsoleSender().sendMessage(" §f" + getLocaleConfig().getLanguage("version") + ": §a" + getVersion());
+        Bukkit.getConsoleSender().sendMessage(" §f" + getLocaleConfig().getLanguage("version") + ": §a" + getDescription().getVersion());
         Bukkit.getConsoleSender().sendMessage("§7");
         Bukkit.getConsoleSender().sendMessage(" §f" + getLocaleConfig().getLanguage("author") + ": §aRam");
         Bukkit.getConsoleSender().sendMessage("§7");
@@ -70,16 +62,8 @@ public class Main extends JavaPlugin {
         Config.loadConfig();
         Bukkit.getPluginCommand("bedwarsitemaddon").setExecutor(new Commands());
         Bukkit.getPluginCommand("bedwarsitemaddon").setTabCompleter(new CommandTabCompleter());
-        if (Bukkit.getPluginManager().getPlugin("BedwarsRel") != null) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (Bukkit.getPluginManager().isPluginEnabled("BedwarsRel")) {
-                        cancel();
-                        registerEvents();
-                    }
-                }
-            }.runTaskTimer(this, 0L, 0L);
+        if (Bukkit.getPluginManager().isPluginEnabled("BedwarsRel")) {
+            registerEvents();
         } else {
             Bukkit.getPluginManager().disablePlugin(this);
         }
@@ -89,30 +73,31 @@ public class Main extends JavaPlugin {
         }
     }
 
-    @Override
-    public void onLoad() {
-        try {
-            // 允许飞行，防止使用道具时踢出服务器
-            Path path = Paths.get(getDataFolder().getParentFile().getAbsolutePath()).getParent().resolve("server.properties");
-            boolean reboot = false;
-            List<String> lines = Files.readAllLines(path);
-            if (lines.contains("allow-flight=false")) {
-                lines.remove("allow-flight=false");
-                lines.add("allow-flight=true");
-                reboot = true;
-            }
-            Files.write(path, lines, StandardOpenOption.TRUNCATE_EXISTING);
-            if (reboot) {
-                Bukkit.shutdown();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    //不要允许飞行了 反作弊被绕的时候我都畏惧了
+//    @Override
+//    public void onLoad() {
+//        try {
+//            // 允许飞行，防止使用道具时踢出服务器
+//            Path path = Paths.get(getDataFolder().getParentFile().getAbsolutePath()).getParent().resolve("server.properties");
+//            boolean reboot = false;
+//            List<String> lines = Files.readAllLines(path);
+//            if (lines.contains("allow-flight=false")) {
+//                lines.remove("allow-flight=false");
+//                lines.add("allow-flight=true");
+//                reboot = true;
+//            }
+//            Files.write(path, lines, StandardOpenOption.TRUNCATE_EXISTING);
+//            if (reboot) {
+//                Bukkit.shutdown();
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     private void registerEvents() {
         Bukkit.getPluginManager().registerEvents(new EventListener(), this);
-        Bukkit.getPluginManager().registerEvents(new UpdateCheck(), this);
+//        Bukkit.getPluginManager().registerEvents(new UpdateCheck(), this); // 服务器倒闭了 用不上更新了
         Bukkit.getPluginManager().registerEvents(new FireBall(), this);
         Bukkit.getPluginManager().registerEvents(new LightTNT(), this);
         Bukkit.getPluginManager().registerEvents(new BridgeEgg(), this);

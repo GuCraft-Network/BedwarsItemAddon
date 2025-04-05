@@ -19,6 +19,9 @@ fireball:
     #启用
     enabled: true
 
+    #飞行速度
+    speed: 6
+
     #弹射速度
     velocity: 0.5
     

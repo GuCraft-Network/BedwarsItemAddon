@@ -1,8 +1,14 @@
 package me.ram.bedwarsitemaddon.items;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import io.github.bedwarsrel.BedwarsRel;
+import io.github.bedwarsrel.events.BedwarsGameStartEvent;
+import io.github.bedwarsrel.game.Game;
+import io.github.bedwarsrel.game.GameState;
+import me.ram.bedwarsitemaddon.Main;
+import me.ram.bedwarsitemaddon.config.Config;
+import me.ram.bedwarsitemaddon.event.BedwarsUseItemEvent;
+import me.ram.bedwarsitemaddon.utils.LocationUtil;
+import me.ram.bedwarsitemaddon.utils.TakeItemUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -20,15 +26,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import io.github.bedwarsrel.BedwarsRel;
-import io.github.bedwarsrel.events.BedwarsGameStartEvent;
-import io.github.bedwarsrel.game.Game;
-import io.github.bedwarsrel.game.GameState;
-import me.ram.bedwarsitemaddon.Main;
-import me.ram.bedwarsitemaddon.config.Config;
-import me.ram.bedwarsitemaddon.event.BedwarsUseItemEvent;
-import me.ram.bedwarsitemaddon.utils.LocationUtil;
-import me.ram.bedwarsitemaddon.utils.TakeItemUtil;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FireBall implements Listener {
 
@@ -43,39 +42,39 @@ public class FireBall implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInteractFireball(PlayerInteractEvent e) {
+        Action action = e.getAction();
+        if (action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR) {
+            return;
+        }
+        ItemStack handItem = e.getItem();
+        if (handItem == null || e.getItem().getType() != Material.FIREBALL) {
+            return;
+        }
         if (!Config.items_fireball_enabled) {
             return;
         }
         Player player = e.getPlayer();
         Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (e.getItem() == null || game == null) {
+        if (game.getState() != GameState.RUNNING || !game.getPlayers().contains(player)) {
             return;
         }
-        if (!game.getPlayers().contains(player)) {
-            return;
+        if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_fireball_cooldown * 1000) {
+            e.setCancelled(true);
+            player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_fireball_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
         }
-        if (game.getState() == GameState.RUNNING) {
-            if ((e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) && e.getItem().getType() == new ItemStack(Material.FIREBALL).getType()) {
-                if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_fireball_cooldown * 1000) {
-                    e.setCancelled(true);
-                    player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_fireball_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000))) + ""));
-                } else {
-                    ItemStack stack = e.getItem();
-                    BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.FIRE_BALL, stack);
-                    Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
-                    if (!bedwarsUseItemEvent.isCancelled()) {
-                        cooldown.put(player, System.currentTimeMillis());
-                        Fireball fireball = player.launchProjectile(Fireball.class);
-                        fireball.setYield((float) Config.items_fireball_range);
-                        fireball.setBounce(false);
-                        fireball.setShooter(player);
-                        fireball.setMetadata("FireBall", new FixedMetadataValue(Main.getInstance(), game.getName() + "." + player.getName()));
-                        TakeItemUtil.TakeItem(player, stack);
-                    }
-                    e.setCancelled(true);
-                }
-            }
+        BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.FIRE_BALL, handItem);
+        Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
+        if (!bedwarsUseItemEvent.isCancelled()) {
+            cooldown.put(player, System.currentTimeMillis());
+            Fireball fireball = player.launchProjectile(Fireball.class);
+            fireball.setVelocity(fireball.getDirection().multiply(Config.items_fireball_speed));
+            fireball.setYield((float) Config.items_fireball_range);
+            fireball.setBounce(false);
+            fireball.setShooter(player);
+            fireball.setMetadata("FireBall", new FixedMetadataValue(Main.getInstance(), game.getName() + "." + player.getName()));
+            TakeItemUtil.TakeItem(player, handItem);
         }
+        e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -122,19 +121,19 @@ public class FireBall implements Listener {
         Fireball fireball = (Fireball) e.getEntity();
         for (Player player : Bukkit.getOnlinePlayers()) {
             Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-            if (game != null && game.getState() == GameState.RUNNING && !game.isSpectator(player) && player.getGameMode() != GameMode.SPECTATOR && player.getGameMode() != GameMode.CREATIVE) {
-                if (e.getEntity().getWorld() == player.getWorld()) {
-                    if (player.getLocation().distanceSquared((e.getEntity().getLocation())) <= Math.pow((fireball.getYield() + 1), 2)) {
-                        if (fireball.getShooter() != null && ((Player) fireball.getShooter()).getUniqueId().equals(player.getUniqueId())) {
-                            player.damage(Config.items_fireball_damage, fireball);
-                        }
-                        if (Config.items_fireball_ejection_enabled) {
-                            player.setVelocity(LocationUtil.getPosition(player.getLocation(), fireball.getLocation(), 3).multiply(Config.items_fireball_ejection_velocity));
-                            if (Config.items_fireball_ejection_no_fall) {
-                                Main.getInstance().getNoFallManage().addPlayer(player);
-                            }
-                        }
-                    }
+            if (game == null || game.getState() != GameState.RUNNING) return;
+            if (game.isSpectator(player) || player.getGameMode() != GameMode.SURVIVAL) return;
+            if (e.getEntity().getWorld() != player.getWorld()) return;
+            if (!(player.getLocation().distanceSquared((e.getEntity().getLocation())) <= Math.pow((fireball.getYield() + 1), 2)))
+                return;
+
+            if (fireball.getShooter() != null && ((Player) fireball.getShooter()).getUniqueId().equals(player.getUniqueId())) {
+                player.damage(Config.items_fireball_damage, fireball);
+            }
+            if (Config.items_fireball_ejection_enabled) {
+                player.setVelocity(LocationUtil.getPosition(player.getLocation(), fireball.getLocation(), 3).multiply(Config.items_fireball_ejection_velocity));
+                if (Config.items_fireball_ejection_no_fall) {
+                    Main.getInstance().getNoFallManage().addPlayer(player);
                 }
             }
         }

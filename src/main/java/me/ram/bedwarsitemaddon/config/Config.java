@@ -6,7 +6,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Config {
@@ -59,6 +59,7 @@ public class Config {
     public static double items_trampoline_velocity;
     public static double items_tnt_launch_launch_velocity;
     public static double items_tnt_launch_ejection_velocity;
+    public static double items_fireball_speed;
     public static double items_fireball_range;
     public static double items_tnt_range;
     public static double items_tnt_launch_range;
@@ -113,6 +114,7 @@ public class Config {
         items_fireball_ejection_velocity = items_config.getDouble("fireball.ejection.velocity");
         items_tnt_ejection_velocity = items_config.getDouble("tnt.ejection.velocity");
         items_tnt_launch_ejection_velocity = items_config.getDouble("tnt_launch.ejection.velocity");
+        items_fireball_speed = items_config.getDouble("fireball.speed");
         items_fireball_range = items_config.getDouble("fireball.range");
         items_tnt_range = items_config.getDouble("tnt.range");
         items_tnt_launch_range = items_config.getDouble("tnt_launch.range");
@@ -184,7 +186,7 @@ public class Config {
         if (language_config.contains(path) && language_config.isList(path)) {
             return ColorUtil.colorList(language_config.getStringList(path));
         }
-        return Arrays.asList("null");
+        return Collections.singletonList("null");
     }
 
     private static File getLanguageFile() {
