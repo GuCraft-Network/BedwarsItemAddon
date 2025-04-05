@@ -98,16 +98,14 @@ public class Parachute implements Listener {
         }
         Player player = e.getPlayer();
         Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (game == null) {
+        if (game == null || game.getState() != GameState.RUNNING || game.isOverSet()) {
             return;
         }
-        if (!game.getPlayers().contains(player)) {
+        if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
             return;
         }
-        if (game.getState() == GameState.RUNNING) {
-            if (e.getBlock().getType() == new ItemStack(Material.valueOf(Config.items_parachute_item)).getType()) {
-                e.setCancelled(true);
-            }
+        if (e.getBlock().getType() == Material.valueOf(Config.items_parachute_item)) {
+            e.setCancelled(true);
         }
     }
 
@@ -116,36 +114,42 @@ public class Parachute implements Listener {
         if (!Config.items_parachute_enabled) {
             return;
         }
+        Action action = e.getAction();
+        if (action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR) {
+            return;
+        }
+        ItemStack handItem = e.getItem();
+        if (handItem == null || handItem.getType() != Material.valueOf(Config.items_parachute_item)) {
+            return;
+        }
         Player player = e.getPlayer();
         Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (e.getItem() == null || game == null) {
+        if (game == null || game.getState() != GameState.RUNNING || game.isOverSet()) {
             return;
         }
-        if (!game.getPlayers().contains(player)) {
+        if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
             return;
         }
-        if (game.getState() == GameState.RUNNING) {
-            if ((e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) && e.getItem().getType() == new ItemStack(Material.valueOf(Config.items_parachute_item)).getType()) {
-                if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_parachute_cooldown * 1000) {
-                    e.setCancelled(true);
-                    player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_parachute_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
-                } else {
-                    ItemStack stack = e.getItem();
-                    BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.PARACHUTE, stack);
-                    Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
-                    if (!bedwarsUseItemEvent.isCancelled()) {
-                        cooldown.put(player, System.currentTimeMillis());
-                        ejection.get(game.getName()).put(player, ejection.get(game.getName()).getOrDefault(player, 0) + 1);
-                        player.getWorld().playSound(player.getLocation(), SoundMachine.get("FIREWORK_LARGE_BLAST", "ENTITY_FIREWORK_LARGE_BLAST"), 1.0f, 1.0f);
-                        player.getWorld().playEffect(player.getLocation(), Effect.EXPLOSION_LARGE, 1);
-                        player.setSneaking(true);
-                        this.setParachute(game, player);
-                        TakeItemUtil.TakeItem(player, stack);
-                    }
-                    e.setCancelled(true);
-                }
-            }
+        e.setCancelled(true);
+
+        if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_parachute_cooldown * 1000) {
+            player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_parachute_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
+            return;
         }
+
+        BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.TNT_LAUNCH, handItem);
+        Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
+        if (bedwarsUseItemEvent.isCancelled()) {
+            return;
+        }
+
+        cooldown.put(player, System.currentTimeMillis());
+        ejection.get(game.getName()).put(player, ejection.get(game.getName()).getOrDefault(player, 0) + 1);
+        player.getWorld().playSound(player.getLocation(), SoundMachine.get("FIREWORK_LARGE_BLAST", "ENTITY_FIREWORK_LARGE_BLAST"), 1.0f, 1.0f);
+        player.getWorld().playEffect(player.getLocation(), Effect.EXPLOSION_LARGE, 1);
+        player.setSneaking(true);
+        this.setParachute(game, player);
+        TakeItemUtil.TakeItem(player, handItem);
     }
 
     public void setParachute(Game game, Player player) {

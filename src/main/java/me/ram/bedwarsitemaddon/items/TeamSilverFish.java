@@ -111,13 +111,10 @@ public class TeamSilverFish implements Listener {
         }
         Player player = (Player) e.getEntity();
         Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (game == null) {
+        if (game == null || game.getState() != GameState.RUNNING || game.isOverSet()) {
             return;
         }
-        if (!(game.getState() == GameState.RUNNING)) {
-            return;
-        }
-        if (game.isSpectator(player)) {
+        if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
             return;
         }
         Silverfish silverfish = (Silverfish) e.getDamager();
@@ -147,13 +144,10 @@ public class TeamSilverFish implements Listener {
         }
         Player player = (Player) e.getDamager();
         Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (game == null) {
+        if (game == null || game.getState() != GameState.RUNNING || game.isOverSet()) {
             return;
         }
-        if (!(game.getState() == GameState.RUNNING)) {
-            return;
-        }
-        if (game.isSpectator(player)) {
+        if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
             return;
         }
         Silverfish silverfishe = (Silverfish) e.getEntity();

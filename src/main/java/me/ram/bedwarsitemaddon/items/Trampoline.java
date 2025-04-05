@@ -83,53 +83,54 @@ public class Trampoline implements Listener {
         if (!Config.items_trampoline_enabled) {
             return;
         }
+        Action action = e.getAction();
+        if (action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR) {
+            return;
+        }
+        ItemStack handItem = e.getItem();
+        if (handItem == null || handItem.getType() != Material.valueOf(Config.items_trampoline_item)) {
+            return;
+        }
         Player player = e.getPlayer();
         Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (e.getItem() == null || game == null) {
+        if (game == null || game.getState() != GameState.RUNNING || game.isOverSet()) {
             return;
         }
-        if (game.isOverSet()) {
+        if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
             return;
         }
-        if (!game.getPlayers().contains(player)) {
+        e.setCancelled(true);
+
+        if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_trampoline_cooldown * 1000) {
+            player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_trampoline_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
-        if (game.getState() == GameState.RUNNING) {
-            if ((e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) && e.getItem().getType() == new ItemStack(Material.valueOf(Config.items_trampoline_item)).getType()) {
-                if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_trampoline_cooldown * 1000) {
-                    e.setCancelled(true);
-                    player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_trampoline_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
-                } else {
-                    ItemStack stack = e.getItem();
-                    Location location1 = player.getLocation();
-                    Location location2 = player.getLocation();
-                    int r = 0;
-                    if (Config.items_trampoline_size <= 1) {
-                        r = 3;
-                    } else if (Config.items_trampoline_size == 2) {
-                        r = 4;
-                    } else if (Config.items_trampoline_size >= 3) {
-                        r = 5;
-                    }
-                    location1.add(r, 0, r);
-                    location2.add(-r, 1, -r);
-                    if (this.isEnoughSpace(location1, location2)) {
-                        BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.TRAMPOLINE, stack);
-                        Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
-                        if (!bedwarsUseItemEvent.isCancelled()) {
-                            cooldown.put(player, System.currentTimeMillis());
-                            this.setTrampolineBlock(game, player.getLocation(), player, Config.items_trampoline_size);
-                            player.teleport(player.getLocation().add(0, 2, 0));
-                            player.setVelocity(new Vector(0, Config.items_trampoline_velocity, 0));
-                            TakeItemUtil.TakeItem(player, stack);
-                        }
-                    } else {
-                        player.sendMessage(Config.items_trampoline_lack_space);
-                        return;
-                    }
-                    e.setCancelled(true);
-                }
+
+        ItemStack stack = e.getItem();
+        Location location1 = player.getLocation();
+        Location location2 = player.getLocation();
+        int r = 0;
+        if (Config.items_trampoline_size <= 1) {
+            r = 3;
+        } else if (Config.items_trampoline_size == 2) {
+            r = 4;
+        } else if (Config.items_trampoline_size >= 3) {
+            r = 5;
+        }
+        location1.add(r, 0, r);
+        location2.add(-r, 1, -r);
+        if (this.isEnoughSpace(location1, location2)) {
+            BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.TRAMPOLINE, stack);
+            Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
+            if (!bedwarsUseItemEvent.isCancelled()) {
+                cooldown.put(player, System.currentTimeMillis());
+                this.setTrampolineBlock(game, player.getLocation(), player, Config.items_trampoline_size);
+                player.teleport(player.getLocation().add(0, 2, 0));
+                player.setVelocity(new Vector(0, Config.items_trampoline_velocity, 0));
+                TakeItemUtil.TakeItem(player, stack);
             }
+        } else {
+            player.sendMessage(Config.items_trampoline_lack_space);
         }
     }
 
