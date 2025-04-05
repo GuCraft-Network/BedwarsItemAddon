@@ -11,6 +11,7 @@ import me.ram.bedwarsitemaddon.utils.LocationUtil;
 import me.ram.bedwarsitemaddon.utils.TakeItemUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
@@ -25,6 +26,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -131,7 +133,22 @@ public class FireBall implements Listener {
                 player.damage(Config.items_fireball_damage, fireball);
             }
             if (Config.items_fireball_ejection_enabled) {
-                player.setVelocity(LocationUtil.getPosition(player.getLocation(), fireball.getLocation(), 3).multiply(Config.items_fireball_ejection_velocity));
+                Location location = e.getEntity().getLocation();
+                Vector vector = location.toVector();
+                Vector playerVector = player.getLocation().toVector();
+                Vector normalizedVector = vector.subtract(playerVector).normalize();
+                Vector horizontalVector = normalizedVector.multiply(Config.items_fireball_ejection_knockback_horizontal);
+                double y = Config.items_fireball_ejection_knockback_vertical * 1.5;
+//                double y = normalizedVector.getY();
+//                if (y < 0) {
+//                    y += 1.5;
+//                }
+//                if (y <= 0.5) {
+//                    y = fireballVertical * 1.5; // kb for not jumping
+//                } else {
+//                    y = y * fireballVertical * 1.5; // kb for jumping
+//                }
+                player.setVelocity(horizontalVector.setY(y));
                 if (Config.items_fireball_ejection_no_fall) {
                     Main.getInstance().getNoFallManage().addPlayer(player);
                 }

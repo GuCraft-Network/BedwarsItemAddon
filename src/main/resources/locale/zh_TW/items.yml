@@ -22,8 +22,10 @@ fireball:
     #飞行速度
     speed: 6
 
-    #彈射速度
-    velocity: 0.5
+    #彈射击退
+    knockback:
+      horizontal: 1.05
+      vertical: 0.75
     
     #無摔落傷害
     no_fall: false

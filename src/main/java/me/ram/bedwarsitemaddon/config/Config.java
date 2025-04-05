@@ -51,8 +51,9 @@ public class Config {
     public static double items_tnt_launch_cooldown;
     public static double items_magic_milk_cooldown;
     public static double items_compact_tower_cooldown;
-    public static double items_fireball_ejection_velocity;
     public static double items_fireball_ejection_speed;
+    public static double items_fireball_ejection_knockback_horizontal;
+    public static double items_fireball_ejection_knockback_vertical;
     public static double items_tnt_ejection_velocity;
     public static double items_parachute_velocity;
     public static double items_parachute_landing_velocity;
@@ -111,8 +112,9 @@ public class Config {
         items_tnt_enabled = items_config.getBoolean("tnt.enabled");
         items_tnt_ejection_enabled = items_config.getBoolean("tnt.ejection.enabled");
         items_tnt_ejection_no_fall = items_config.getBoolean("tnt.ejection.no_fall");
-        items_fireball_ejection_velocity = items_config.getDouble("fireball.ejection.velocity");
         items_fireball_ejection_speed = items_config.getDouble("fireball.ejection.speed");
+        items_fireball_ejection_knockback_horizontal = items_config.getDouble("fireball.ejection.knockback.horizontal") * -1;
+        items_fireball_ejection_knockback_vertical = items_config.getDouble("fireball.ejection.knockback.vertical");
         items_tnt_ejection_velocity = items_config.getDouble("tnt.ejection.velocity");
         items_tnt_launch_ejection_velocity = items_config.getDouble("tnt_launch.ejection.velocity");
         items_fireball_range = items_config.getDouble("fireball.range");
