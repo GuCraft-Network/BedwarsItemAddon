@@ -3,6 +3,7 @@ package me.ram.bedwarsitemaddon.items;
 public enum EnumItem {
 
     BRIDGE_EGG("BridgeEgg"),
+    COMPACT_TOWER("CompactTower"),
     ENDER_PEARL_CHAIR("EnderPearlChair"),
     FIRE_BALL("FireBall"),
     LIGHT_TNT("LightTNT"),

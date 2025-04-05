@@ -19,6 +19,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
@@ -76,7 +77,7 @@ public class CompactTower implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockPlace(BlockPlaceEvent e) {
         if (!Config.items_compact_tower_enabled) {
             return;
@@ -97,23 +98,24 @@ public class CompactTower implements Listener {
         if (team == null) {
             return;
         }
-        e.setCancelled(true);
-
-        if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_compact_tower_cooldown * 1000) {
-            player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_compact_tower_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
-            return;
-        }
-
-        BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.BRIDGE_EGG, handItem);
-        Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
-        if (bedwarsUseItemEvent.isCancelled()) {
-            return;
-        }
 
         // 给我整不会了 这可以绕过出生点限制 判断isCancelled也不管用 那只能这么生草了
         Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
             if (e.getBlock().getType() != Material.valueOf(Config.items_compact_tower_item)) return;
 
+            e.setCancelled(true);
+            e.getBlock().setType(Material.AIR); // 不设置为air的话 有时setCancelled不管作用 会多出箱子的
+
+            if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_compact_tower_cooldown * 1000) {
+                player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_compact_tower_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
+                return;
+            }
+
+            BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.COMPACT_TOWER, handItem);
+            Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
+            if (bedwarsUseItemEvent.isCancelled()) {
+                return;
+            }
             cooldown.put(player, System.currentTimeMillis());
             setblock(game, team, e.getBlock().getLocation(), player);
             TakeItemUtil.TakeItem(player, handItem);
