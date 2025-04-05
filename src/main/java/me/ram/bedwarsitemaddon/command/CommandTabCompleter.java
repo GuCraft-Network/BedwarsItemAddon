@@ -14,7 +14,7 @@ public class CommandTabCompleter implements TabCompleter {
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
         List<String> suggest = getSuggest(sender, args);
         String last = args[args.length - 1];
-        if (!last.equals("")) {
+        if (!last.isEmpty()) {
             List<String> list = new ArrayList<>();
             suggest.forEach(s -> {
                 if (s.startsWith(last)) {
@@ -28,7 +28,7 @@ public class CommandTabCompleter implements TabCompleter {
 
     private List<String> getSuggest(CommandSender sender, String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("help", "reload", "upcheck");
+            return Arrays.asList("help", "reload");
         }
         return new ArrayList<>();
     }

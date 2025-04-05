@@ -10,39 +10,38 @@ public class Commands implements CommandExecutor {
 
     @Override
     public boolean onCommand(final CommandSender sender, final Command cmd, final String label, final String[] args) {
-        if (cmd.getName().equalsIgnoreCase("bedwarsitemaddon")) {
-            if (args.length == 0) {
-                sender.sendMessage("§f===========================================================");
-                sender.sendMessage("");
-                sender.sendMessage("§b                     BedwarsItemAddon");
-                sender.sendMessage("");
-                sender.sendMessage("§f  " + Main.getInstance().getLocaleConfig().getLanguage("version") + ": §a" + Main.getInstance().getVersion());
-                sender.sendMessage("");
-                sender.sendMessage("§f  " + Main.getInstance().getLocaleConfig().getLanguage("author") + ": §aRam");
-                sender.sendMessage("");
-                sender.sendMessage("§f===========================================================");
-                return true;
-            }
-            if (args[0].equalsIgnoreCase("help")) {
-                sender.sendMessage("§f=====================================================");
-                sender.sendMessage("");
-                sender.sendMessage("§b§l BedwarsItemAddon §fv" + Main.getInstance().getVersion() + "  §7by Ram");
-                sender.sendMessage("");
-                Config.getLanguageList("commands.help").forEach(sender::sendMessage);
-                sender.sendMessage("");
-                sender.sendMessage("§f=====================================================");
-                return true;
-            }
-            if (args[0].equalsIgnoreCase("reload")) {
-                if (!sender.hasPermission("bedwarsitemaddon.reload")) {
-                    sender.sendMessage(Config.getLanguage("commands.message.prefix") + Config.getLanguage("commands.message.no_permission"));
-                    return true;
-                }
-                Config.loadConfig();
-                sender.sendMessage(Config.getLanguage("commands.message.prefix") + Config.getLanguage("commands.message.reloaded"));
-                return true;
-            }
+        if (args.length == 0) {
+            sender.sendMessage("§f===========================================================");
+            sender.sendMessage("");
+            sender.sendMessage("§b                     BedwarsItemAddon");
+            sender.sendMessage("");
+            sender.sendMessage("§f  " + Main.getInstance().getLocaleConfig().getLanguage("version") + ": §a" + Main.getInstance().getVersion());
+            sender.sendMessage("");
+            sender.sendMessage("§f  " + Main.getInstance().getLocaleConfig().getLanguage("author") + ": §aRam Modifed By LinMoyu_");
+            sender.sendMessage("");
+            sender.sendMessage("§f===========================================================");
+            return true;
         }
-        return false;
+        String arg = args[0].toLowerCase();
+        if (arg.equals("help")) {
+            sender.sendMessage("§f=====================================================");
+            sender.sendMessage("");
+            sender.sendMessage("§b§l BedwarsItemAddon §fv" + Main.getInstance().getVersion() + "  §7by Ram");
+            sender.sendMessage("");
+            Config.getLanguageList("commands.help").forEach(sender::sendMessage);
+            sender.sendMessage("");
+            sender.sendMessage("§f=====================================================");
+            return true;
+        }
+        if (arg.equalsIgnoreCase("reload")) {
+            if (!sender.hasPermission("bedwarsitemaddon.reload")) {
+                sender.sendMessage(Config.getLanguage("commands.message.prefix") + Config.getLanguage("commands.message.no_permission"));
+                return true;
+            }
+            Config.loadConfig();
+            sender.sendMessage(Config.getLanguage("commands.message.prefix") + Config.getLanguage("commands.message.reloaded"));
+            return true;
+        }
+        return true;
     }
 }

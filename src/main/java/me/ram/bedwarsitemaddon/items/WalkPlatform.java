@@ -50,41 +50,41 @@ public class WalkPlatform implements Listener {
         if (!Config.items_walk_platform_enabled) {
             return;
         }
+        Action action = e.getAction();
+        if (action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR) {
+            return;
+        }
+        ItemStack handItem = e.getItem();
+        if (handItem == null || e.getItem().getType() != Material.valueOf(Config.items_walk_platform_item)) {
+            return;
+        }
         Player player = e.getPlayer();
         Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (e.getItem() == null || game == null) {
+        if (e.getItem() == null || game == null || game.getState() != GameState.RUNNING) {
+            return;
+        }
+        if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
             return;
         }
         if (game.isOverSet()) {
             return;
         }
-        if (!game.getPlayers().contains(player)) {
+        e.setCancelled(true);
+        if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_walk_platform_cooldown * 1000) {
+            player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_walk_platform_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
-        if (game.isSpectator(player)) {
+        BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.WALK_PLATFORM, handItem);
+        Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
+        if (bedwarsUseItemEvent.isCancelled()) {
             return;
         }
-        if (game.getState() == GameState.RUNNING) {
-            if ((e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) && e.getItem().getType() == Material.valueOf(Config.items_walk_platform_item)) {
-                e.setCancelled(true);
-                if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_walk_platform_cooldown * 1000) {
-                    player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_walk_platform_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
-                } else {
-                    ItemStack stack = e.getItem();
-                    BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.WALK_PLATFORM, stack);
-                    Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
-                    if (!bedwarsUseItemEvent.isCancelled()) {
-                        cooldown.put(player, System.currentTimeMillis());
-                        TakeItemUtil.TakeItem(player, e.getItem());
-                        if (tasks.get(game.getName()).containsKey(player)) {
-                            tasks.get(game.getName()).get(player).cancel();
-                        }
-                        runPlatform(player, game, game.getPlayerTeam(player));
-                    }
-                    e.setCancelled(true);
-                }
-            }
+        cooldown.put(player, System.currentTimeMillis());
+        if (tasks.get(game.getName()).containsKey(player)) {
+            tasks.get(game.getName()).get(player).cancel();
         }
+        runPlatform(player, game, game.getPlayerTeam(player));
+        TakeItemUtil.TakeItem(player, e.getItem());
     }
 
     private void runPlatform(Player player, Game game, Team team) {
@@ -98,11 +98,7 @@ public class WalkPlatform implements Listener {
                     return;
                 }
                 i++;
-                if (!player.isOnline()) {
-                    this.cancel();
-                    return;
-                }
-                if (player.isDead() || player.getGameMode() == GameMode.SPECTATOR || !game.getPlayers().contains(player) || game.isSpectator(player) || player.isSneaking()) {
+                if (!player.isOnline() || player.isDead() || player.getGameMode() == GameMode.SPECTATOR || !game.getPlayers().contains(player) || game.isSpectator(player)) {
                     this.cancel();
                     return;
                 }

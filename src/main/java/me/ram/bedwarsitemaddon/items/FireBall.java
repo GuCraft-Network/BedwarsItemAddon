@@ -43,6 +43,9 @@ public class FireBall implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInteractFireball(PlayerInteractEvent e) {
+        if (!Config.items_fireball_enabled) {
+            return;
+        }
         Action action = e.getAction();
         if (action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR) {
             return;
@@ -51,16 +54,13 @@ public class FireBall implements Listener {
         if (handItem == null || e.getItem().getType() != Material.FIREBALL) {
             return;
         }
-        if (!Config.items_fireball_enabled) {
-            return;
-        }
         Player player = e.getPlayer();
         Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
         if (game == null || game.getState() != GameState.RUNNING || !game.getPlayers().contains(player)) {
             return;
         }
+        e.setCancelled(true);
         if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_fireball_cooldown * 1000) {
-            e.setCancelled(true);
             player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_fireball_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
@@ -77,7 +77,6 @@ public class FireBall implements Listener {
         fireball.setShooter(player);
         fireball.setMetadata("FireBall", new FixedMetadataValue(Main.getInstance(), game.getName() + "." + player.getName()));
         TakeItemUtil.TakeItem(player, handItem);
-        e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

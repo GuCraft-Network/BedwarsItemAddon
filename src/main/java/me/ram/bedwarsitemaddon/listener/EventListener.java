@@ -28,9 +28,7 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onStarted(BedwarsGameStartedEvent e) {
-        e.getGame().getPlayers().forEach(player -> {
-            Main.getInstance().getNoFallManage().removePlayer(player);
-        });
+        e.getGame().getPlayers().forEach(player -> Main.getInstance().getNoFallManage().removePlayer(player));
     }
 
     @EventHandler
@@ -66,9 +64,7 @@ public class EventListener implements Listener {
         if (man.isJust(player)) {
             return;
         }
-        man.addTask(player, Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
-            man.removePlayer(player);
-        }, 10L));
+        man.addTask(player, Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> man.removePlayer(player), 10L));
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
