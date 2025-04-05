@@ -11,8 +11,6 @@ import java.util.List;
 
 public class Config {
 
-    public static boolean update_check_enabled;
-    public static boolean update_check_report;
     public static String message_cooling;
     public static boolean items_fireball_enabled;
     public static boolean items_fireball_ejection_enabled;
@@ -103,8 +101,6 @@ public class Config {
         language_config = YamlConfiguration.loadConfiguration(getLanguageFile());
         FileConfiguration items_config = YamlConfiguration.loadConfiguration(items_file);
         FileConfiguration config = Main.getInstance().getConfig();
-        update_check_enabled = config.getBoolean("update_check.enabled");
-        update_check_report = config.getBoolean("update_check.report");
         message_cooling = getLanguage("item.cooling");
         items_fireball_enabled = items_config.getBoolean("fireball.enabled");
         items_fireball_ejection_enabled = items_config.getBoolean("fireball.ejection.enabled");

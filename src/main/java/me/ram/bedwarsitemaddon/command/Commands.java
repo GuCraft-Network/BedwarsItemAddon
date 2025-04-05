@@ -17,7 +17,7 @@ public class Commands implements CommandExecutor {
             sender.sendMessage("");
             sender.sendMessage("§f  " + Main.getInstance().getLocaleConfig().getLanguage("version") + ": §a" + Main.getInstance().getVersion());
             sender.sendMessage("");
-            sender.sendMessage("§f  " + Main.getInstance().getLocaleConfig().getLanguage("author") + ": §aRam Modifed By LinMoyu_");
+            sender.sendMessage("§f  " + Main.getInstance().getLocaleConfig().getLanguage("author") + ": §aRam §7| §fModifed By LinMoyu_.");
             sender.sendMessage("");
             sender.sendMessage("§f===========================================================");
             return true;

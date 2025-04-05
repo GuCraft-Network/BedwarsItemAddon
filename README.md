@@ -32,8 +32,6 @@ BedwarsScoreBoardAddon (Soft) -> https://github.com/TheRamU/BedwarsScoreBoardAdd
 
 /bwia reload - Reload Configuration / 重载配置文件
 
-/bwia upcheck - Update Check / 检查更新
-
 #### Permissions
 
 bedwarsitemaddon.reload - Allow Reload Configuration / 允许重载配置文件
