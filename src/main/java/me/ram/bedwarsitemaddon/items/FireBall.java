@@ -59,8 +59,8 @@ public class FireBall implements Listener {
         if (game == null || game.getState() != GameState.RUNNING || !game.getPlayers().contains(player)) {
             return;
         }
-        e.setCancelled(true);
         if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_fireball_cooldown * 1000) {
+            e.setCancelled(true);
             player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_fireball_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
@@ -69,6 +69,7 @@ public class FireBall implements Listener {
         if (bedwarsUseItemEvent.isCancelled()) {
             return;
         }
+        e.setCancelled(true);
         cooldown.put(player, System.currentTimeMillis());
         Fireball fireball = player.launchProjectile(Fireball.class);
         fireball.setVelocity(fireball.getDirection().multiply(Config.items_fireball_ejection_speed));

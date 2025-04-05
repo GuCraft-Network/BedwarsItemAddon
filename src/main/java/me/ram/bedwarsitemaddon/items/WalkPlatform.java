@@ -60,7 +60,7 @@ public class WalkPlatform implements Listener {
         }
         Player player = e.getPlayer();
         Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (e.getItem() == null || game == null || game.getState() != GameState.RUNNING) {
+        if (game == null || game.getState() != GameState.RUNNING) {
             return;
         }
         if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
@@ -69,16 +69,17 @@ public class WalkPlatform implements Listener {
         if (game.isOverSet()) {
             return;
         }
-        e.setCancelled(true);
         if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_walk_platform_cooldown * 1000) {
+            e.setCancelled(true);
             player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_walk_platform_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
         BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.WALK_PLATFORM, handItem);
-        Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
         if (bedwarsUseItemEvent.isCancelled()) {
             return;
         }
+        e.setCancelled(true);
+        Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
         cooldown.put(player, System.currentTimeMillis());
         if (tasks.get(game.getName()).containsKey(player)) {
             tasks.get(game.getName()).get(player).cancel();
