@@ -67,7 +67,7 @@ public class FireBall implements Listener {
         if (!bedwarsUseItemEvent.isCancelled()) {
             cooldown.put(player, System.currentTimeMillis());
             Fireball fireball = player.launchProjectile(Fireball.class);
-            fireball.setVelocity(fireball.getDirection().multiply(Config.items_fireball_speed));
+            fireball.setVelocity(fireball.getDirection().multiply(Config.items_fireball_ejection_speed));
             fireball.setYield((float) Config.items_fireball_range);
             fireball.setBounce(false);
             fireball.setShooter(player);
@@ -138,4 +138,31 @@ public class FireBall implements Listener {
             }
         }
     }
+
+//   试着换个事件处理击退, 结果跟EntityExplodeEvent差不多.
+//    @EventHandler
+//    public void onFireBallHit(ProjectileHitEvent e) {
+//        if (!Config.items_fireball_enabled) {
+//            return;
+//        }
+//        Entity entity = e.getEntity();
+//        if (!(entity instanceof Fireball) || !entity.hasMetadata("FireBall")) {
+//            return;
+//        }
+//        Fireball fireball = (Fireball) e.getEntity();
+//        for (Player player : Bukkit.getOnlinePlayers()) {
+//            Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
+//            if (game == null || game.getState() != GameState.RUNNING) return;
+//            if (game.isSpectator(player) || player.getGameMode() != GameMode.SURVIVAL) return;
+//            if (e.getEntity().getWorld() != player.getWorld()) return;
+//            if (!(player.getLocation().distanceSquared((e.getEntity().getLocation())) <= Math.pow((fireball.getYield() + 1), 2)))
+//                return;
+//            if (Config.items_fireball_ejection_enabled) {
+//                player.setVelocity(LocationUtil.getPosition(player.getLocation(), fireball.getLocation(), 3).multiply(Config.items_fireball_ejection_velocity));
+//                if (Config.items_fireball_ejection_no_fall) {
+//                    Main.getInstance().getNoFallManage().addPlayer(player);
+//                }
+//            }
+//        }
+//    }
 }
