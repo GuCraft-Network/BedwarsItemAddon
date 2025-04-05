@@ -22,8 +22,10 @@ fireball:
     #飞行速度
     speed: 6
 
-    #弹射速度
-    velocity: 0.5
+    #弹射击退
+    knockback:
+      horizontal: 1.05
+      vertical: 0.75
     
     #无摔落伤害
     no_fall: false
@@ -39,7 +41,7 @@ tnt:
   cooldown: 0.0
 
   #爆炸延迟
-  fuse_ticks: 80
+  fuse_ticks: 40
 
   #伤害
   damage: 3

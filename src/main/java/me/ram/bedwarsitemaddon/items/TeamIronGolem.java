@@ -76,35 +76,38 @@ public class TeamIronGolem implements Listener {
         if (!Config.items_team_iron_golem_enabled) {
             return;
         }
+        Action action = e.getAction();
+        if (action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR) {
+            return;
+        }
+        ItemStack handItem = e.getItem();
+        if (e.getClickedBlock() == null || handItem == null || handItem.getType() != Material.valueOf(Config.items_team_iron_golem_item)) {
+            return;
+        }
         Player player = e.getPlayer();
         Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (e.getItem() == null || e.getClickedBlock() == null || game == null) {
+        if (game == null || game.getState() != GameState.RUNNING || game.isOverSet()) {
             return;
         }
-        if (!game.getPlayers().contains(player)) {
+        if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
             return;
         }
-        if (game.isSpectator(player)) {
+        e.setCancelled(true);
+
+        if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_team_iron_golem_cooldown * 1000) {
+            e.setCancelled(true);
+            player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_team_iron_golem_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
-        if (game.getState() == GameState.RUNNING) {
-            if ((e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
-                if (e.getItem().getType() == Material.valueOf(Config.items_team_iron_golem_item) && e.getItem().getDurability() == 0) {
-                    if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_team_iron_golem_cooldown * 1000) {
-                        e.setCancelled(true);
-                        player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_team_iron_golem_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
-                    } else {
-                        ItemStack stack = e.getItem();
-                        BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.TEAM_IRON_GOLEM, stack);
-                        Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
-                        if (!bedwarsUseItemEvent.isCancelled()) {
-                            TakeItemUtil.TakeItem(player, e.getItem());
-                            this.SpawnIronGolem(player, e.getClickedBlock().getRelative(e.getBlockFace()).getLocation().add(0.5, 0, 0.5));
-                        }
-                    }
-                }
-            }
+
+        BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.FIRE_BALL, handItem);
+        Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
+        if (bedwarsUseItemEvent.isCancelled()) {
+            return;
         }
+
+        TakeItemUtil.TakeItem(player, e.getItem());
+        this.SpawnIronGolem(player, e.getClickedBlock().getRelative(e.getBlockFace()).getLocation().add(0.5, 0, 0.5));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -117,16 +120,13 @@ public class TeamIronGolem implements Listener {
         }
         Player player = (Player) e.getDamager();
         Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (game == null) {
+        if (game == null || game.getState() != GameState.RUNNING || game.isOverSet()) {
             return;
         }
-        if (!(game.getState() == GameState.RUNNING)) {
+        if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
             return;
         }
         if (game.getPlayerTeam(player) == null) {
-            return;
-        }
-        if (game.isSpectator(player)) {
             return;
         }
         IronGolem irongoleme = (IronGolem) e.getEntity();

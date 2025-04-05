@@ -97,7 +97,7 @@ public class Main extends JavaPlugin {
 
     private void registerEvents() {
         Bukkit.getPluginManager().registerEvents(new EventListener(), this);
-//        Bukkit.getPluginManager().registerEvents(new UpdateCheck(), this); // 服务器倒闭了 用不上更新了
+//        Bukkit.getPluginManager().registerEvents(new UpdateCheck(), this); // 服务器倒闭了 用不了更新了
         Bukkit.getPluginManager().registerEvents(new FireBall(), this);
         Bukkit.getPluginManager().registerEvents(new LightTNT(), this);
         Bukkit.getPluginManager().registerEvents(new BridgeEgg(), this);

@@ -22,8 +22,10 @@ fireball:
     #Flying speed
     speed: 6
 
-    #Ejection velocity
-    velocity: 0.5
+    #Ejection knockback
+    knockback:
+      horizontal: 1.05
+      vertical: 0.75
     
     #No falling damage
     no_fall: false
@@ -39,7 +41,7 @@ tnt:
   cooldown: 0.0
 
   #Explosion delay
-  fuse_ticks: 80
+  fuse_ticks: 40
 
   #Damage value
   damage: 3

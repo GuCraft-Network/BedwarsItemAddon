@@ -15,7 +15,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -36,42 +35,48 @@ public class TNTLaunch implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     public void onInteract(PlayerInteractEvent e) {
         if (!Config.items_tnt_launch_enabled) {
             return;
         }
+        Action action = e.getAction();
+        if (action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR) {
+            return;
+        }
+        ItemStack handItem = e.getItem();
+        if (handItem == null || handItem.getType() != Material.valueOf(Config.items_tnt_launch_item)) {
+            return;
+        }
         Player player = e.getPlayer();
         Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (e.getItem() == null || game == null) {
+        if (game == null || game.getState() != GameState.RUNNING || game.isOverSet()) {
             return;
         }
-        if (!game.getPlayers().contains(player)) {
+        if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
             return;
         }
-        if (game.getState() == GameState.RUNNING) {
-            if ((e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) && e.getItem().getType() == Material.valueOf(Config.items_tnt_launch_item)) {
-                if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_tnt_launch_cooldown * 1000) {
-                    e.setCancelled(true);
-                    player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_tnt_launch_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
-                } else {
-                    ItemStack stack = e.getItem();
-                    BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.TNT_LAUNCH, stack);
-                    Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
-                    if (!bedwarsUseItemEvent.isCancelled()) {
-                        cooldown.put(player, System.currentTimeMillis());
-                        TNTPrimed tnt = player.getWorld().spawn(player.getLocation().clone().add(0, 1, 0), TNTPrimed.class);
-                        tnt.setYield((float) Config.items_tnt_launch_range);
-                        tnt.setIsIncendiary(false);
-                        tnt.setVelocity(player.getLocation().getDirection().multiply(Config.items_tnt_launch_launch_velocity));
-                        tnt.setFuseTicks(Config.items_tnt_launch_fuse_ticks);
-                        tnt.setMetadata("TNTLaunch", new FixedMetadataValue(Main.getInstance(), game.getName() + "." + player.getName()));
-                        TakeItemUtil.TakeItem(player, stack);
-                    }
-                    e.setCancelled(true);
-                }
-            }
+        e.setCancelled(true);
+
+        if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_tnt_launch_cooldown * 1000) {
+            player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_tnt_launch_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
+            return;
         }
+
+        BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.TNT_LAUNCH, handItem);
+        Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
+        if (bedwarsUseItemEvent.isCancelled()) {
+            return;
+        }
+
+        cooldown.put(player, System.currentTimeMillis());
+        TNTPrimed tnt = player.getWorld().spawn(player.getLocation().clone().add(0, 1, 0), TNTPrimed.class);
+        tnt.setYield((float) Config.items_tnt_launch_range);
+        tnt.setIsIncendiary(false);
+        tnt.setVelocity(player.getLocation().getDirection().multiply(Config.items_tnt_launch_launch_velocity));
+        tnt.setFuseTicks(Config.items_tnt_launch_fuse_ticks);
+        tnt.setMetadata("TNTLaunch", new FixedMetadataValue(Main.getInstance(), game.getName() + "." + player.getName()));
+        TakeItemUtil.TakeItem(player, handItem);
     }
 
     @EventHandler
@@ -80,7 +85,7 @@ public class TNTLaunch implements Listener {
             return;
         }
         Entity damager = e.getDamager();
-        if (!damager.hasMetadata("TNTLaunch")) {
+        if (!(damager instanceof TNTPrimed) || !damager.hasMetadata("TNTLaunch")) {
             return;
         }
         Entity entity = e.getEntity();
@@ -89,25 +94,18 @@ public class TNTLaunch implements Listener {
         }
         Player player = (Player) entity;
         Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (game == null) {
+        if (game == null || game.getState() != GameState.RUNNING) {
             return;
         }
-        if (damager instanceof TNTPrimed) {
-            if (!game.getPlayers().contains(player)) {
-                return;
-            }
-            if (game.isSpectator(player)) {
-                return;
-            }
-            if (game.getState() == GameState.RUNNING) {
-                if (Config.items_tnt_launch_ejection_enabled) {
-                    player.setVelocity(LocationUtil.getPosition(player.getLocation(), damager.getLocation(), 1).multiply(Config.items_tnt_launch_ejection_velocity));
-                    if (Config.items_tnt_launch_ejection_no_fall) {
-                        Main.getInstance().getNoFallManage().addPlayer(player);
-                    }
-                }
-                e.setDamage(Config.items_tnt_launch_damage);
+        if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
+            return;
+        }
+        if (Config.items_tnt_launch_ejection_enabled) {
+            player.setVelocity(LocationUtil.getPosition(player.getLocation(), damager.getLocation(), 1).multiply(Config.items_tnt_launch_ejection_velocity));
+            if (Config.items_tnt_launch_ejection_no_fall) {
+                Main.getInstance().getNoFallManage().addPlayer(player);
             }
         }
+        e.setDamage(Config.items_tnt_launch_damage);
     }
 }

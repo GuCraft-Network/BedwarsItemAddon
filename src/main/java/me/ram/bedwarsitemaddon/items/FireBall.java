@@ -7,10 +7,10 @@ import io.github.bedwarsrel.game.GameState;
 import me.ram.bedwarsitemaddon.Main;
 import me.ram.bedwarsitemaddon.config.Config;
 import me.ram.bedwarsitemaddon.event.BedwarsUseItemEvent;
-import me.ram.bedwarsitemaddon.utils.LocationUtil;
 import me.ram.bedwarsitemaddon.utils.TakeItemUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
@@ -25,6 +25,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,42 +41,48 @@ public class FireBall implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     public void onInteractFireball(PlayerInteractEvent e) {
+        if (!Config.items_fireball_enabled) {
+            return;
+        }
         Action action = e.getAction();
         if (action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR) {
             return;
         }
         ItemStack handItem = e.getItem();
-        if (handItem == null || e.getItem().getType() != Material.FIREBALL) {
-            return;
-        }
-        if (!Config.items_fireball_enabled) {
+        if (handItem == null || handItem.getType() != Material.FIREBALL) {
             return;
         }
         Player player = e.getPlayer();
         Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (game.getState() != GameState.RUNNING || !game.getPlayers().contains(player)) {
+        if (game == null || game.getState() != GameState.RUNNING || game.isOverSet()) {
             return;
         }
+        if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
+            return;
+        }
+        e.setCancelled(true);
+
         if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_fireball_cooldown * 1000) {
-            e.setCancelled(true);
             player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_fireball_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
+
         BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.FIRE_BALL, handItem);
         Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
-        if (!bedwarsUseItemEvent.isCancelled()) {
-            cooldown.put(player, System.currentTimeMillis());
-            Fireball fireball = player.launchProjectile(Fireball.class);
-            fireball.setVelocity(fireball.getDirection().multiply(Config.items_fireball_ejection_speed));
-            fireball.setYield((float) Config.items_fireball_range);
-            fireball.setBounce(false);
-            fireball.setShooter(player);
-            fireball.setMetadata("FireBall", new FixedMetadataValue(Main.getInstance(), game.getName() + "." + player.getName()));
-            TakeItemUtil.TakeItem(player, handItem);
+        if (bedwarsUseItemEvent.isCancelled()) {
+            return;
         }
-        e.setCancelled(true);
+
+        cooldown.put(player, System.currentTimeMillis());
+        Fireball fireball = player.launchProjectile(Fireball.class);
+        fireball.setVelocity(fireball.getDirection().multiply(Config.items_fireball_ejection_speed));
+        fireball.setYield((float) Config.items_fireball_range);
+        fireball.setBounce(false);
+        fireball.setShooter(player);
+        fireball.setMetadata("FireBall", new FixedMetadataValue(Main.getInstance(), game.getName() + "." + player.getName()));
+        TakeItemUtil.TakeItem(player, handItem);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -132,7 +139,13 @@ public class FireBall implements Listener {
                 player.damage(Config.items_fireball_damage, fireball);
             }
             if (Config.items_fireball_ejection_enabled) {
-                player.setVelocity(LocationUtil.getPosition(player.getLocation(), fireball.getLocation(), 3).multiply(Config.items_fireball_ejection_velocity));
+                Location location = e.getEntity().getLocation();
+                Vector vector = location.toVector();
+                Vector playerVector = player.getLocation().toVector();
+                Vector normalizedVector = vector.subtract(playerVector).normalize();
+                Vector horizontalVector = normalizedVector.multiply(Config.items_fireball_ejection_knockback_horizontal);
+                double y = Config.items_fireball_ejection_knockback_vertical * 1.5;
+                player.setVelocity(horizontalVector.setY(y));
                 if (Config.items_fireball_ejection_no_fall) {
                     Main.getInstance().getNoFallManage().addPlayer(player);
                 }
@@ -140,7 +153,7 @@ public class FireBall implements Listener {
         }
     }
 
-//   试着换个事件处理击退, 结果跟EntityExplodeEvent差不多.
+//   尝试用其他事件处理击退, 结果跟EntityExplodeEvent差不多.
 //    @EventHandler
 //    public void onFireBallHit(ProjectileHitEvent e) {
 //        if (!Config.items_fireball_enabled) {

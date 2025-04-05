@@ -59,38 +59,12 @@ public class LocaleConfig {
             case ZH_CN:
                 language.put("version", "版本");
                 language.put("author", "作者");
-                language.put("update_checking", "§b§lBWIA §f>> §a正在检测更新...");
-                language.put("no_update", "§b§lBWIA §f>> §a您使用的已是最新版本！");
-                language.put("update_check_failed", "§b§lBWIA §f>> §c检测更新失败，请检查服务器网络连接！");
-                language.put("update_info", "检测到版本更新！");
                 language.put("running_version", "当前版本");
-                language.put("update_version", "更新版本");
-                language.put("updates", "更新内容");
-                language.put("update_download", "更新地址");
                 break;
             case EN_US:
                 language.put("version", "Version");
                 language.put("author", "Author");
-                language.put("update_checking", "§b§lBWIA §f>> §aUpdate check...");
-                language.put("no_update", "§b§lBWIA §f>> §aYou are running the latest version!");
-                language.put("update_check_failed", "§b§lBWIA §f>> §cUpdate check failed! Please check the server network!");
-                language.put("update_info", "There are version update!");
                 language.put("running_version", "Running version");
-                language.put("update_version", "Update version");
-                language.put("updates", "Updates");
-                language.put("update_download", "Download");
-                break;
-            case ZH_TW:
-                language.put("version", "版本");
-                language.put("author", "作者");
-                language.put("update_checking", "§b§lBWIA §f>> §a正在檢測更新...");
-                language.put("no_update", "§b§lBWIA §f>> §a您使用的已是最新版本！");
-                language.put("update_check_failed", "§b§lBWIA §f>> §c檢測更新失敗，請檢查服務器網絡連接！");
-                language.put("update_info", "檢測到版本更新！");
-                language.put("running_version", "當前版本");
-                language.put("update_version", "更新版本");
-                language.put("updates", "更新內容");
-                language.put("update_download", "更新地址");
                 break;
             default:
                 break;

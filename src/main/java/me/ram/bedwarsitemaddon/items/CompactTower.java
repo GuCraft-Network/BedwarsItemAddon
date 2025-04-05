@@ -19,7 +19,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
@@ -77,39 +76,43 @@ public class CompactTower implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
-        Player player = e.getPlayer();
         if (!Config.items_compact_tower_enabled) {
             return;
         }
-        Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (e.getItemInHand() == null || game == null) {
+        Player player = e.getPlayer();
+        ItemStack handItem = e.getItemInHand();
+        if (handItem == null || handItem.getType() != Material.valueOf(Config.items_compact_tower_item)) {
             return;
         }
-        if (game.isOverSet() || game.getState() != GameState.RUNNING || game.isSpectator(player)) {
+        Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
+        if (game == null || game.getState() != GameState.RUNNING || game.isOverSet()) {
+            return;
+        }
+        if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
             return;
         }
         Team team = game.getPlayerTeam(player);
         if (team == null) {
             return;
         }
-        if (e.getItemInHand().getType() != new ItemStack(Material.valueOf(Config.items_compact_tower_item)).getType()) {
-            return;
-        }
         e.setCancelled(true);
+
         if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_compact_tower_cooldown * 1000) {
             player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_compact_tower_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
-        ItemStack stack = e.getItemInHand();
-        BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.BRIDGE_EGG, stack);
+
+        BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.BRIDGE_EGG, handItem);
         Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
-        if (!bedwarsUseItemEvent.isCancelled()) {
-            cooldown.put(player, System.currentTimeMillis());
-            setblock(game, team, e.getBlock().getLocation(), player);
-            TakeItemUtil.TakeItem(player, stack);
+        if (bedwarsUseItemEvent.isCancelled()) {
+            return;
         }
+
+        cooldown.put(player, System.currentTimeMillis());
+        setblock(game, team, e.getBlock().getLocation(), player);
+        TakeItemUtil.TakeItem(player, handItem);
     }
 
     public void setblock(Game game, Team team, Location location, Player player) {
