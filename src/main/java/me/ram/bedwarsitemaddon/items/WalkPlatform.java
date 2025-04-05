@@ -10,6 +10,7 @@ import me.ram.bedwarsitemaddon.Main;
 import me.ram.bedwarsitemaddon.config.Config;
 import me.ram.bedwarsitemaddon.event.BedwarsUseItemEvent;
 import me.ram.bedwarsitemaddon.utils.TakeItemUtil;
+import me.ram.bedwarsitemaddon.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -66,6 +67,9 @@ public class WalkPlatform implements Listener {
         if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
             return;
         }
+
+        if (!Utils.isCanPlace(game, player.getLocation())) return;
+
         e.setCancelled(true);
 
         if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_walk_platform_cooldown * 1000) {

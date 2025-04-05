@@ -8,6 +8,7 @@ import me.ram.bedwarsitemaddon.Main;
 import me.ram.bedwarsitemaddon.config.Config;
 import me.ram.bedwarsitemaddon.event.BedwarsUseItemEvent;
 import me.ram.bedwarsitemaddon.utils.LocationUtil;
+import me.ram.bedwarsitemaddon.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -50,29 +51,26 @@ public class LightTNT implements Listener {
             return;
         }
 
-        // 给我整不会了 这可以绕过出生点限制 判断isCancelled也不管用 那只能这么生草了
-        Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
-            if (e.getBlock().getType() != Material.TNT) return;
+        if (!Utils.isCanPlace(game, e.getBlock().getLocation())) return;
 
-            if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_tnt_cooldown * 1000) {
-                player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_tnt_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
-                return;
-            }
+        if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_tnt_cooldown * 1000) {
+            player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_tnt_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
+            return;
+        }
 
-            BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.LIGHT_TNT, new ItemStack(Material.TNT));
-            Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
-            if (bedwarsUseItemEvent.isCancelled()) {
-                return;
-            }
+        BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.LIGHT_TNT, new ItemStack(Material.TNT));
+        Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
+        if (bedwarsUseItemEvent.isCancelled()) {
+            return;
+        }
 
-            cooldown.put(player, System.currentTimeMillis());
-            e.getBlock().setType(Material.AIR);
-            TNTPrimed tnt = e.getBlock().getLocation().getWorld().spawn(e.getBlock().getLocation().add(0.5, 0, 0.5), TNTPrimed.class);
-            tnt.setYield((float) Config.items_tnt_range);
-            tnt.setIsIncendiary(false);
-            tnt.setFuseTicks(Config.items_tnt_fuse_ticks);
-            tnt.setMetadata("LightTNT", new FixedMetadataValue(Main.getInstance(), game.getName() + "." + player.getName()));
-        }, 1L);
+        cooldown.put(player, System.currentTimeMillis());
+        e.getBlock().setType(Material.AIR);
+        TNTPrimed tnt = e.getBlock().getLocation().getWorld().spawn(e.getBlock().getLocation().add(0.5, 0, 0.5), TNTPrimed.class);
+        tnt.setYield((float) Config.items_tnt_range);
+        tnt.setIsIncendiary(false);
+        tnt.setFuseTicks(Config.items_tnt_fuse_ticks);
+        tnt.setMetadata("LightTNT", new FixedMetadataValue(Main.getInstance(), game.getName() + "." + player.getName()));
 
     }
 

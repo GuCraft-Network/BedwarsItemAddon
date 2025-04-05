@@ -4,19 +4,17 @@ import io.github.bedwarsrel.BedwarsRel;
 import io.github.bedwarsrel.events.BedwarsGameStartEvent;
 import io.github.bedwarsrel.game.Game;
 import io.github.bedwarsrel.game.GameState;
-import io.github.bedwarsrel.game.ResourceSpawner;
 import io.github.bedwarsrel.game.Team;
 import io.github.bedwarsrel.utils.SoundMachine;
 import me.ram.bedwarsitemaddon.Main;
 import me.ram.bedwarsitemaddon.config.Config;
 import me.ram.bedwarsitemaddon.event.BedwarsUseItemEvent;
 import me.ram.bedwarsitemaddon.utils.TakeItemUtil;
-import me.ram.bedwarsscoreboardaddon.utils.BedwarsUtil;
+import me.ram.bedwarsitemaddon.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -99,26 +97,31 @@ public class CompactTower implements Listener {
             return;
         }
 
+        if (!Utils.isCanPlace(game, e.getBlock().getLocation())) return;
+
+        e.setCancelled(true);
+        e.getBlock().setType(Material.AIR);
+
+
+        if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_compact_tower_cooldown * 1000) {
+            player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_compact_tower_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
+            return;
+        }
+
+        BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.COMPACT_TOWER, handItem);
+        Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
+        if (bedwarsUseItemEvent.isCancelled()) {
+            return;
+        }
+        cooldown.put(player, System.currentTimeMillis());
+        setblock(game, team, e.getBlock().getLocation(), player);
+        TakeItemUtil.TakeItem(player, handItem);
         // 给我整不会了 这可以绕过出生点限制 判断isCancelled也不管用 那只能这么生草了
         Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
-            if (e.getBlock().getType() != Material.valueOf(Config.items_compact_tower_item)) return;
-
-            e.setCancelled(true);
-            e.getBlock().setType(Material.AIR); // 不设置为air的话 有时setCancelled不管作用 会多出箱子的
-
-            if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_compact_tower_cooldown * 1000) {
-                player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_compact_tower_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
-                return;
+            if (e.getBlock().getType() != Material.valueOf(Config.items_compact_tower_item)) {
             }
 
-            BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.COMPACT_TOWER, handItem);
-            Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
-            if (bedwarsUseItemEvent.isCancelled()) {
-                return;
-            }
-            cooldown.put(player, System.currentTimeMillis());
-            setblock(game, team, e.getBlock().getLocation(), player);
-            TakeItemUtil.TakeItem(player, handItem);
+
         }, 1L);
     }
 
@@ -150,7 +153,7 @@ public class CompactTower implements Listener {
                             loc = location.clone().add(z, y, -x);
                         }
                         Block block = loc.getBlock();
-                        if (!isCanPlace(game, loc)) {
+                        if (!Utils.isCanPlace(game, loc)) {
                             continue;
                         }
                         try {
@@ -190,55 +193,6 @@ public class CompactTower implements Listener {
                 i++;
             }
         }.runTaskTimer(Main.getInstance(), 0, 3L);
-    }
-
-    private boolean isCanPlace(Game game, Location location) {
-        Block block = location.getBlock();
-        if (!block.getType().equals(Material.AIR)) {
-            return false;
-        }
-        if (!game.getRegion().isInRegion(location)) {
-            return false;
-        }
-        for (Entity entity : location.getWorld().getNearbyEntities(location.clone().add(0.5, 1, 0.5), 0.5, 1, 0.5)) {
-            if (!(entity instanceof Player)) {
-                continue;
-            }
-            Player player = (Player) entity;
-            if (!game.isInGame(player) || game.isSpectator(player)) {
-                continue;
-            }
-            if (Bukkit.getPluginManager().isPluginEnabled("BedwarsScoreBoardAddon") && BedwarsUtil.isRespawning(player)) {
-                continue;
-            }
-            return false;
-        }
-        if (Bukkit.getPluginManager().isPluginEnabled("BedwarsScoreBoardAddon")) {
-            if (me.ram.bedwarsscoreboardaddon.config.Config.spawn_no_build_spawn_enabled) {
-                for (Team team : game.getTeams().values()) {
-                    if (team.getSpawnLocation().distanceSquared(block.getLocation().clone().add(0.5, 0, 0.5)) <= Math.pow(me.ram.bedwarsscoreboardaddon.config.Config.spawn_no_build_spawn_range, 2)) {
-                        return false;
-                    }
-                }
-            }
-            if (me.ram.bedwarsscoreboardaddon.config.Config.spawn_no_build_resource_enabled) {
-                for (ResourceSpawner spawner : game.getResourceSpawners()) {
-                    if (spawner.getLocation().distanceSquared(block.getLocation().clone().add(0.5, 0, 0.5)) <= Math.pow(me.ram.bedwarsscoreboardaddon.config.Config.spawn_no_build_resource_range, 2)) {
-                        return false;
-                    }
-                }
-                if (me.ram.bedwarsscoreboardaddon.config.Config.game_team_spawner.containsKey(game.getName())) {
-                    for (List<Location> locs : me.ram.bedwarsscoreboardaddon.config.Config.game_team_spawner.get(game.getName()).values()) {
-                        for (Location loc : locs) {
-                            if (loc.distanceSquared(block.getLocation().clone().add(0.5, 0, 0.5)) <= Math.pow(me.ram.bedwarsscoreboardaddon.config.Config.spawn_no_build_resource_range, 2)) {
-                                return false;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return true;
     }
 
     private int getFace(Location location) {

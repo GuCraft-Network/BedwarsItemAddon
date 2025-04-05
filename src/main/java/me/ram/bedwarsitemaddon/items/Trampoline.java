@@ -10,6 +10,7 @@ import me.ram.bedwarsitemaddon.config.Config;
 import me.ram.bedwarsitemaddon.event.BedwarsUseItemEvent;
 import me.ram.bedwarsitemaddon.utils.LocationUtil;
 import me.ram.bedwarsitemaddon.utils.TakeItemUtil;
+import me.ram.bedwarsitemaddon.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -99,6 +100,9 @@ public class Trampoline implements Listener {
         if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
             return;
         }
+
+        if (!Utils.isCanPlace(game, player.getLocation())) return;
+
         e.setCancelled(true);
 
         if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_trampoline_cooldown * 1000) {

@@ -9,6 +9,7 @@ import me.ram.bedwarsitemaddon.config.Config;
 import me.ram.bedwarsitemaddon.event.BedwarsUseItemEvent;
 import me.ram.bedwarsitemaddon.utils.LocationUtil;
 import me.ram.bedwarsitemaddon.utils.TakeItemUtil;
+import me.ram.bedwarsitemaddon.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -91,6 +92,10 @@ public class BridgeEgg implements Listener {
                         @Override
                         public void run() {
                             if (game.isOverSet() || game.getState() != GameState.RUNNING) {
+                                this.cancel();
+                                return;
+                            }
+                            if (!Utils.isCanPlace(game, location)) {
                                 this.cancel();
                                 return;
                             }
