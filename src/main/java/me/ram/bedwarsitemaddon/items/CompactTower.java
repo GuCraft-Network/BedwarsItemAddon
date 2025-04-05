@@ -1,15 +1,17 @@
 package me.ram.bedwarsitemaddon.items;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import io.github.bedwarsrel.BedwarsRel;
+import io.github.bedwarsrel.events.BedwarsGameStartEvent;
+import io.github.bedwarsrel.game.Game;
+import io.github.bedwarsrel.game.GameState;
+import io.github.bedwarsrel.game.ResourceSpawner;
+import io.github.bedwarsrel.game.Team;
+import io.github.bedwarsrel.utils.SoundMachine;
+import me.ram.bedwarsitemaddon.Main;
+import me.ram.bedwarsitemaddon.config.Config;
+import me.ram.bedwarsitemaddon.event.BedwarsUseItemEvent;
+import me.ram.bedwarsitemaddon.utils.TakeItemUtil;
+import me.ram.bedwarsscoreboardaddon.utils.BedwarsUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,18 +25,15 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import io.github.bedwarsrel.BedwarsRel;
-import io.github.bedwarsrel.events.BedwarsGameStartEvent;
-import io.github.bedwarsrel.game.Game;
-import io.github.bedwarsrel.game.GameState;
-import io.github.bedwarsrel.game.ResourceSpawner;
-import io.github.bedwarsrel.game.Team;
-import io.github.bedwarsrel.utils.SoundMachine;
-import me.ram.bedwarsitemaddon.Main;
-import me.ram.bedwarsitemaddon.config.Config;
-import me.ram.bedwarsitemaddon.event.BedwarsUseItemEvent;
-import me.ram.bedwarsitemaddon.utils.TakeItemUtil;
-import me.ram.bedwarsscoreboardaddon.utils.BedwarsUtil;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CompactTower implements Listener {
 

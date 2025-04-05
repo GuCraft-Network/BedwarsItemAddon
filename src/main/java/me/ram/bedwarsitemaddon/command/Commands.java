@@ -1,12 +1,11 @@
 package me.ram.bedwarsitemaddon.command;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-
 import me.ram.bedwarsitemaddon.Main;
 import me.ram.bedwarsitemaddon.config.Config;
 import me.ram.bedwarsitemaddon.network.UpdateCheck;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 
 public class Commands implements CommandExecutor {
 

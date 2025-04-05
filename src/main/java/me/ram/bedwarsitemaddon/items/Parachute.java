@@ -1,16 +1,18 @@
 package me.ram.bedwarsitemaddon.items;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Effect;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import io.github.bedwarsrel.BedwarsRel;
+import io.github.bedwarsrel.events.BedwarsGameOverEvent;
+import io.github.bedwarsrel.events.BedwarsGameStartEvent;
+import io.github.bedwarsrel.game.Game;
+import io.github.bedwarsrel.game.GameState;
+import io.github.bedwarsrel.utils.SoundMachine;
+import me.ram.bedwarsitemaddon.Main;
+import me.ram.bedwarsitemaddon.config.Config;
+import me.ram.bedwarsitemaddon.event.BedwarsUseItemEvent;
+import me.ram.bedwarsitemaddon.utils.LocationUtil;
+import me.ram.bedwarsitemaddon.utils.NMS;
+import me.ram.bedwarsitemaddon.utils.TakeItemUtil;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
@@ -26,23 +28,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
-import io.github.bedwarsrel.BedwarsRel;
-import io.github.bedwarsrel.events.BedwarsGameOverEvent;
-import io.github.bedwarsrel.events.BedwarsGameStartEvent;
-import io.github.bedwarsrel.game.Game;
-import io.github.bedwarsrel.game.GameState;
-import io.github.bedwarsrel.utils.SoundMachine;
-import me.ram.bedwarsitemaddon.Main;
-import me.ram.bedwarsitemaddon.config.Config;
-import me.ram.bedwarsitemaddon.event.BedwarsUseItemEvent;
-import me.ram.bedwarsitemaddon.utils.LocationUtil;
-import me.ram.bedwarsitemaddon.utils.NMS;
-import me.ram.bedwarsitemaddon.utils.TakeItemUtil;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Parachute implements Listener {
-    private Map<String, List<ArmorStand>> armorstands = new HashMap<>();
     private final Map<Player, Long> cooldown = new HashMap<>();
     private final Map<String, Map<Player, Integer>> ejection = new HashMap<>();
+    private Map<String, List<ArmorStand>> armorstands = new HashMap<>();
 
     @EventHandler
     public void onStart(BedwarsGameStartEvent e) {

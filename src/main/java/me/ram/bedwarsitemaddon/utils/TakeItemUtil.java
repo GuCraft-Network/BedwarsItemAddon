@@ -1,10 +1,9 @@
 package me.ram.bedwarsitemaddon.utils;
 
+import io.github.bedwarsrel.BedwarsRel;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import io.github.bedwarsrel.BedwarsRel;
 
 public class TakeItemUtil {
     public static void TakeItem(Player player, ItemStack stack) {

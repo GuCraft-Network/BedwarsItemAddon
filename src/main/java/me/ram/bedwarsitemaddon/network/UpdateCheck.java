@@ -1,21 +1,20 @@
 package me.ram.bedwarsitemaddon.network;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import me.ram.bedwarsitemaddon.Main;
+import me.ram.bedwarsitemaddon.config.Config;
+import me.ram.bedwarsitemaddon.config.EnumLocale;
+import me.ram.bedwarsitemaddon.utils.URLUtil;
+import me.ram.bedwarsitemaddon.utils.UnicodeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import me.ram.bedwarsitemaddon.Main;
-import me.ram.bedwarsitemaddon.config.Config;
-import me.ram.bedwarsitemaddon.config.EnumLocale;
-import me.ram.bedwarsitemaddon.utils.URLUtil;
-import me.ram.bedwarsitemaddon.utils.UnicodeUtil;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class UpdateCheck implements Listener {
 
@@ -49,15 +48,6 @@ public class UpdateCheck implements Listener {
                 }
             }, 20 * 86400, 20 * 86400);
         }, 5);
-    }
-
-    @EventHandler
-    public void playerJoin(PlayerJoinEvent e) {
-        if (Config.update_check_enabled && Config.update_check_report && version != null && post != null && update != null) {
-            if (e.getPlayer().hasPermission("bedwarsitemaddon.updatecheck") && !version.equals(Main.getVersion())) {
-                sendInfo(e.getPlayer(), version, post, update);
-            }
-        }
     }
 
     public static void upCheck(CommandSender sender) {
@@ -118,5 +108,14 @@ public class UpdateCheck implements Listener {
             }
         }
         return null;
+    }
+
+    @EventHandler
+    public void playerJoin(PlayerJoinEvent e) {
+        if (Config.update_check_enabled && Config.update_check_report && version != null && post != null && update != null) {
+            if (e.getPlayer().hasPermission("bedwarsitemaddon.updatecheck") && !version.equals(Main.getVersion())) {
+                sendInfo(e.getPlayer(), version, post, update);
+            }
+        }
     }
 }

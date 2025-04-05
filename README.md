@@ -1,6 +1,7 @@
 # BedwarsItemAddon
 
 ### What's this?
+
 A Item addon plugin of bedwarsrel
 
 BedwarsRel 道具拓展插件
@@ -13,7 +14,6 @@ Spigot -> https://www.spigotmc.org/resources/94409/
 
 MCBBS -> https://www.mcbbs.net/thread-827639-1-1.html
 
-
 ### Depends / 依赖
 
 ProtocolLib -> https://www.spigotmc.org/resources/1997/
@@ -25,6 +25,7 @@ BedwarsScoreBoardAddon (Soft) -> https://github.com/TheRamU/BedwarsScoreBoardAdd
 ### Commands & Permissions / 命令 & 权限
 
 #### Commands
+
 /bwia - Plugin Info / 插件信息
 
 /bwia help - Get Help / 获取帮助
@@ -34,10 +35,10 @@ BedwarsScoreBoardAddon (Soft) -> https://github.com/TheRamU/BedwarsScoreBoardAdd
 /bwia upcheck - Update Check / 检查更新
 
 #### Permissions
+
 bedwarsitemaddon.reload - Allow Reload Configuration / 允许重载配置文件
 
 bedwarsitemaddon.updatecheck - Allow Update Check / 允许检查更新
-
 
 ### Item List / 道具列表
 

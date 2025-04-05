@@ -1,12 +1,11 @@
 package me.ram.bedwarsitemaddon.event;
 
+import io.github.bedwarsrel.game.Game;
+import me.ram.bedwarsitemaddon.items.EnumItem;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
-
-import io.github.bedwarsrel.game.Game;
-import me.ram.bedwarsitemaddon.items.EnumItem;
 
 public class BedwarsUseItemEvent extends Event {
 
@@ -22,6 +21,10 @@ public class BedwarsUseItemEvent extends Event {
         this.player = player;
         this.itemtype = itemtype;
         this.consumeitem = consumeitem;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     public Game getGame() {
@@ -49,10 +52,6 @@ public class BedwarsUseItemEvent extends Event {
     }
 
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 }

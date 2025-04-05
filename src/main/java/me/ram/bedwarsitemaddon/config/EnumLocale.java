@@ -11,10 +11,6 @@ public enum EnumLocale {
         this.name = name;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public static EnumLocale getByName(String n) {
         for (EnumLocale type : values()) {
             if (type.getName().equals(n)) {
@@ -22,5 +18,9 @@ public enum EnumLocale {
             }
         }
         return null;
+    }
+
+    public String getName() {
+        return name;
     }
 }

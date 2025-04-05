@@ -2,7 +2,7 @@
 update_check:
 
   #Enable update check?
-  enabled:  true
+  enabled: true
 
   #Report version updates to the online admin player
   report: true

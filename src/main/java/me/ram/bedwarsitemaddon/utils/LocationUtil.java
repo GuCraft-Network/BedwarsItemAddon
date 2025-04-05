@@ -1,12 +1,12 @@
 package me.ram.bedwarsitemaddon.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LocationUtil {
     public static Location getLocation(Location location, int x, int y, int z) {

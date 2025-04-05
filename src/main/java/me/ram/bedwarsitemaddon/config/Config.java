@@ -1,19 +1,16 @@
 package me.ram.bedwarsitemaddon.config;
 
+import me.ram.bedwarsitemaddon.Main;
+import me.ram.bedwarsitemaddon.utils.ColorUtil;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-
-import me.ram.bedwarsitemaddon.Main;
-import me.ram.bedwarsitemaddon.utils.ColorUtil;
-
 public class Config {
 
-    private static FileConfiguration file_config;
-    private static FileConfiguration language_config;
     public static boolean update_check_enabled;
     public static boolean update_check_report;
     public static String message_cooling;
@@ -83,6 +80,8 @@ public class Config {
     public static String items_walk_platform_item;
     public static String items_tnt_launch_item;
     public static String items_compact_tower_item;
+    private static FileConfiguration file_config;
+    private static FileConfiguration language_config;
 
     public static void loadConfig() {
         File folder = new File(Main.getInstance().getDataFolder(), "/");

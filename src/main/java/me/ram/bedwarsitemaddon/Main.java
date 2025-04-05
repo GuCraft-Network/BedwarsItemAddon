@@ -1,39 +1,26 @@
 package me.ram.bedwarsitemaddon;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.List;
-
+import lombok.Getter;
+import me.ram.bedwarsitemaddon.command.CommandTabCompleter;
+import me.ram.bedwarsitemaddon.command.Commands;
+import me.ram.bedwarsitemaddon.config.Config;
+import me.ram.bedwarsitemaddon.config.LocaleConfig;
+import me.ram.bedwarsitemaddon.items.*;
+import me.ram.bedwarsitemaddon.listener.EventListener;
+import me.ram.bedwarsitemaddon.manage.NoFallManage;
+import me.ram.bedwarsitemaddon.network.UpdateCheck;
 import org.bstats.metrics.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import lombok.Getter;
-import me.ram.bedwarsitemaddon.command.CommandTabCompleter;
-import me.ram.bedwarsitemaddon.command.Commands;
-import me.ram.bedwarsitemaddon.config.Config;
-import me.ram.bedwarsitemaddon.config.LocaleConfig;
-import me.ram.bedwarsitemaddon.items.BridgeEgg;
-import me.ram.bedwarsitemaddon.items.CompactTower;
-import me.ram.bedwarsitemaddon.items.EnderPearlChair;
-import me.ram.bedwarsitemaddon.items.ExplosionProof;
-import me.ram.bedwarsitemaddon.items.FireBall;
-import me.ram.bedwarsitemaddon.items.LightTNT;
-import me.ram.bedwarsitemaddon.items.MagicMilk;
-import me.ram.bedwarsitemaddon.items.Parachute;
-import me.ram.bedwarsitemaddon.items.TNTLaunch;
-import me.ram.bedwarsitemaddon.items.TeamIronGolem;
-import me.ram.bedwarsitemaddon.items.TeamSilverFish;
-import me.ram.bedwarsitemaddon.items.Trampoline;
-import me.ram.bedwarsitemaddon.items.WalkPlatform;
-import me.ram.bedwarsitemaddon.listener.EventListener;
-import me.ram.bedwarsitemaddon.manage.NoFallManage;
-import me.ram.bedwarsitemaddon.network.UpdateCheck;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.List;
 
 /**
  * @author Ram

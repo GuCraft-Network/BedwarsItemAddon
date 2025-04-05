@@ -1,9 +1,9 @@
 package me.ram.bedwarsitemaddon.event;
 
+import io.github.bedwarsrel.game.Game;
 import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import io.github.bedwarsrel.game.Game;
 
 public class BedwarsFishSpawnEvent extends Event {
 
@@ -15,6 +15,10 @@ public class BedwarsFishSpawnEvent extends Event {
     public BedwarsFishSpawnEvent(Game game, Location location) {
         this.game = game;
         this.location = location;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     public Game getGame() {
@@ -34,10 +38,6 @@ public class BedwarsFishSpawnEvent extends Event {
     }
 
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 }

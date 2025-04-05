@@ -2,7 +2,7 @@
 update_check:
 
   #是否啟用
-  enabled:  true
+  enabled: true
 
   #向在線管理員報告版本更新
   report: true

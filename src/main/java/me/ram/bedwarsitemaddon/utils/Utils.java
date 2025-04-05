@@ -1,11 +1,13 @@
 package me.ram.bedwarsitemaddon.utils;
 
-import org.bukkit.entity.*;
-
 import io.github.bedwarsrel.BedwarsRel;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 public class Utils {
 
@@ -16,7 +18,8 @@ public class Utils {
     public static void sendPlayerActionbar(Player player, String text) {
         try {
             Class.forName("io.github.bedwarsrel.com." + BedwarsRel.getInstance().getCurrentVersion().toLowerCase() + ".ActionBar").getDeclaredMethod("sendActionBar", Player.class, String.class).invoke(null, player, text);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException |
+                 SecurityException | ClassNotFoundException e) {
         }
     }
 

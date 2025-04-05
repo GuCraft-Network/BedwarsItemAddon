@@ -19,10 +19,6 @@ public enum EnumItem {
         this.name = name;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public static EnumItem getByName(String n) {
         for (EnumItem type : values()) {
             if (type.getName().equals(n)) {
@@ -30,5 +26,9 @@ public enum EnumItem {
             }
         }
         return null;
+    }
+
+    public String getName() {
+        return name;
     }
 }

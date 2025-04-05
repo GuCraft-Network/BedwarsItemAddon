@@ -1,9 +1,9 @@
 package me.ram.bedwarsitemaddon.items;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
+import io.github.bedwarsrel.BedwarsRel;
+import io.github.bedwarsrel.game.Game;
+import io.github.bedwarsrel.game.GameState;
+import me.ram.bedwarsitemaddon.config.Config;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -12,10 +12,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.util.BlockIterator;
 
-import io.github.bedwarsrel.BedwarsRel;
-import io.github.bedwarsrel.game.Game;
-import io.github.bedwarsrel.game.GameState;
-import me.ram.bedwarsitemaddon.config.Config;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class ExplosionProof implements Listener {
 
