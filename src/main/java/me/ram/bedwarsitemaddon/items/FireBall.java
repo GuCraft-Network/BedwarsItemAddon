@@ -51,16 +51,19 @@ public class FireBall implements Listener {
             return;
         }
         ItemStack handItem = e.getItem();
-        if (handItem == null || e.getItem().getType() != Material.FIREBALL) {
+        if (handItem == null || handItem.getType() != Material.FIREBALL) {
             return;
         }
         Player player = e.getPlayer();
         Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (game == null || game.getState() != GameState.RUNNING || !game.getPlayers().contains(player)) {
+        if (game == null || game.getState() != GameState.RUNNING || game.isOverSet()) {
             return;
         }
+        if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
+            return;
+        }
+        e.setCancelled(true);
         if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_fireball_cooldown * 1000) {
-            e.setCancelled(true);
             player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_fireball_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
@@ -69,7 +72,6 @@ public class FireBall implements Listener {
         if (bedwarsUseItemEvent.isCancelled()) {
             return;
         }
-        e.setCancelled(true);
         cooldown.put(player, System.currentTimeMillis());
         Fireball fireball = player.launchProjectile(Fireball.class);
         fireball.setVelocity(fireball.getDirection().multiply(Config.items_fireball_ejection_speed));

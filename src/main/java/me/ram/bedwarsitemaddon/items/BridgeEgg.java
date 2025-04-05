@@ -41,36 +41,39 @@ public class BridgeEgg implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInteract(PlayerInteractEvent e) {
-        Player player = e.getPlayer();
         if (!Config.items_bridge_egg_enabled) {
             return;
         }
+        Action action = e.getAction();
+        if (action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR) {
+            return;
+        }
+        Player player = e.getPlayer();
+        ItemStack handItem = e.getItem();
+        if (handItem == null || handItem.getType() != Material.EGG) {
+            return;
+        }
         Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (e.getItem() == null || game == null) {
+        if (game == null || game.getState() != GameState.RUNNING || !game.getPlayers().contains(player) || game.isOverSet()) {
             return;
         }
-        if (game.isOverSet() || game.getState() != GameState.RUNNING || game.isSpectator(player)) {
+        e.setCancelled(true);
+        if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_bridge_egg_cooldown * 1000) {
+            e.setCancelled(true);
+            player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_bridge_egg_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
-        if ((e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) && e.getItem().getType() == new ItemStack(Material.EGG).getType()) {
-            if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_bridge_egg_cooldown * 1000) {
-                e.setCancelled(true);
-                player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_bridge_egg_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
-            } else {
-                ItemStack stack = e.getItem();
-                BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.BRIDGE_EGG, stack);
-                Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
-                if (!bedwarsUseItemEvent.isCancelled()) {
-                    cooldown.put(player, System.currentTimeMillis());
-                    Egg egg = player.launchProjectile(Egg.class);
-                    egg.setBounce(false);
-                    egg.setShooter(player);
-                    this.setblock(game, egg, player);
-                    TakeItemUtil.TakeItem(player, stack);
-                }
-                e.setCancelled(true);
-            }
+        BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.BRIDGE_EGG, handItem);
+        Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
+        if (bedwarsUseItemEvent.isCancelled()) {
+            return;
         }
+        cooldown.put(player, System.currentTimeMillis());
+        Egg egg = player.launchProjectile(Egg.class);
+        egg.setBounce(false);
+        egg.setShooter(player);
+        this.setblock(game, egg, player);
+        TakeItemUtil.TakeItem(player, handItem);
     }
 
     public void setblock(Game game, Egg egg, Player player) {

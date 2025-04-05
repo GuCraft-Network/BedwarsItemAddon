@@ -46,19 +46,19 @@ public class TNTLaunch implements Listener {
             return;
         }
         ItemStack handItem = e.getItem();
-        if (handItem == null || e.getItem().getType() != Material.valueOf(Config.items_tnt_launch_item)) {
+        if (handItem == null || handItem.getType() != Material.valueOf(Config.items_tnt_launch_item)) {
             return;
         }
         Player player = e.getPlayer();
         Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (game == null || game.getState() != GameState.RUNNING) {
+        if (game == null || game.getState() != GameState.RUNNING || game.isOverSet()) {
             return;
         }
         if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
             return;
         }
+        e.setCancelled(true);
         if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_tnt_launch_cooldown * 1000) {
-            e.setCancelled(true);
             player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_tnt_launch_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
@@ -67,7 +67,6 @@ public class TNTLaunch implements Listener {
         if (bedwarsUseItemEvent.isCancelled()) {
             return;
         }
-        e.setCancelled(true);
         cooldown.put(player, System.currentTimeMillis());
         TNTPrimed tnt = player.getWorld().spawn(player.getLocation().clone().add(0, 1, 0), TNTPrimed.class);
         tnt.setYield((float) Config.items_tnt_launch_range);

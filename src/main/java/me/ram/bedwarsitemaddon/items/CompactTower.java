@@ -83,18 +83,19 @@ public class CompactTower implements Listener {
         if (!Config.items_compact_tower_enabled) {
             return;
         }
-        Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (e.getItemInHand() == null || game == null) {
+        ItemStack handItem = e.getItemInHand();
+        if (handItem == null || handItem.getType() != Material.valueOf(Config.items_compact_tower_item)) {
             return;
         }
-        if (game.isOverSet() || game.getState() != GameState.RUNNING || game.isSpectator(player)) {
+        Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
+        if (game == null || game.getState() != GameState.RUNNING || game.isOverSet()) {
+            return;
+        }
+        if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
             return;
         }
         Team team = game.getPlayerTeam(player);
         if (team == null) {
-            return;
-        }
-        if (e.getItemInHand().getType() != new ItemStack(Material.valueOf(Config.items_compact_tower_item)).getType()) {
             return;
         }
         e.setCancelled(true);
@@ -102,14 +103,14 @@ public class CompactTower implements Listener {
             player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_compact_tower_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
-        ItemStack stack = e.getItemInHand();
-        BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.BRIDGE_EGG, stack);
+        BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.BRIDGE_EGG, handItem);
         Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
-        if (!bedwarsUseItemEvent.isCancelled()) {
-            cooldown.put(player, System.currentTimeMillis());
-            setblock(game, team, e.getBlock().getLocation(), player);
-            TakeItemUtil.TakeItem(player, stack);
+        if (bedwarsUseItemEvent.isCancelled()) {
+            return;
         }
+        cooldown.put(player, System.currentTimeMillis());
+        setblock(game, team, e.getBlock().getLocation(), player);
+        TakeItemUtil.TakeItem(player, handItem);
     }
 
     public void setblock(Game game, Team team, Location location, Player player) {
