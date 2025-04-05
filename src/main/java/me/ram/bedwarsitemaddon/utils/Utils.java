@@ -149,16 +149,15 @@ public class Utils {
         }
         for (Entity entity : location.getWorld().getNearbyEntities(location.clone().add(0.5, 1, 0.5), 0.5, 1, 0.5)) {
             if (!(entity instanceof Player)) {
-                continue;
+                return false;
             }
             Player player = (Player) entity;
             if (!game.isInGame(player) || game.isSpectator(player)) {
-                continue;
+                return false;
             }
             if (Bukkit.getPluginManager().isPluginEnabled("BedwarsScoreBoardAddon") && BedwarsUtil.isRespawning(player)) {
-                continue;
+                return false;
             }
-            return false;
         }
         if (Bukkit.getPluginManager().isPluginEnabled("BedwarsScoreBoardAddon")) {
             if (me.ram.bedwarsscoreboardaddon.config.Config.spawn_no_build_spawn_enabled) {

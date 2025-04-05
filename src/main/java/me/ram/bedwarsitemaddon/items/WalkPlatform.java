@@ -68,8 +68,6 @@ public class WalkPlatform implements Listener {
             return;
         }
 
-        if (!Utils.isCanPlace(game, player.getLocation())) return;
-
         e.setCancelled(true);
 
         if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_walk_platform_cooldown * 1000) {
@@ -130,7 +128,7 @@ public class WalkPlatform implements Listener {
                 blocks.add(location.clone().add(0, 0, -2).getBlock());
                 blocks.add(location.clone().add(-1, 0, -2).getBlock());
                 for (Block block : blocks) {
-                    if (block.getType() == Material.AIR && game.getRegion().isInRegion(block.getLocation())) {
+                    if (block.getType() == Material.AIR && Utils.isCanPlace(game, location)) {
                         game.getRegion().addPlacedBlock(block, null);
                         block.setType(Material.WOOL);
                         block.setData(team.getColor().getDyeColor().getWoolData());
