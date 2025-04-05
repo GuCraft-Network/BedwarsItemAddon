@@ -8,7 +8,7 @@ import java.net.URLConnection;
 public class URLUtil {
 
     public static String getDocument(String urlString) {
-        StringBuffer document = new StringBuffer("");
+        StringBuffer document = new StringBuffer();
         try {
             URL url = new URL(urlString);
             URLConnection conn = url.openConnection();

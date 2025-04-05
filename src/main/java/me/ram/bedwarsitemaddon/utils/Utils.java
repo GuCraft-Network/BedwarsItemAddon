@@ -37,7 +37,7 @@ public class Utils {
 
     public static void sendPacket(Player player, Object packet) {
         try {
-            Object handle = player.getClass().getMethod("getHandle", (Class<?>[]) new Class[0]).invoke(player, new Object[0]);
+            Object handle = player.getClass().getMethod("getHandle").invoke(player);
             Object playerConnection = handle.getClass().getField("playerConnection").get(handle);
             playerConnection.getClass().getMethod("sendPacket", getNMSClass("Packet")).invoke(playerConnection, packet);
         } catch (Exception e) {
@@ -119,8 +119,8 @@ public class Utils {
         try {
             Object tabHeader = getNMSClass("IChatBaseComponent").getDeclaredClasses()[0].getMethod("a", String.class).invoke(null, "{\"text\":\"" + header + "\"}");
             Object tabFooter = getNMSClass("IChatBaseComponent").getDeclaredClasses()[0].getMethod("a", String.class).invoke(null, "{\"text\":\"" + footer + "\"}");
-            Constructor<?> titleConstructor = getNMSClass("PacketPlayOutPlayerListHeaderFooter").getConstructor((Class<?>[]) new Class[0]);
-            Object packet = titleConstructor.newInstance(new Object[0]);
+            Constructor<?> titleConstructor = getNMSClass("PacketPlayOutPlayerListHeaderFooter").getConstructor();
+            Object packet = titleConstructor.newInstance();
             Field aField = packet.getClass().getDeclaredField("a");
             aField.setAccessible(true);
             aField.set(packet, tabHeader);

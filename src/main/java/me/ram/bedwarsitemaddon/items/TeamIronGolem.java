@@ -34,8 +34,8 @@ import java.util.Map;
 
 public class TeamIronGolem implements Listener {
     private final Map<Player, Long> cooldown = new HashMap<>();
-    private Map<String, Map<IronGolem, Team>> Golems = new HashMap<>();
-    private Map<String, Map<IronGolem, Integer>> Guardtime = new HashMap<>();
+    private final Map<String, Map<IronGolem, Team>> Golems = new HashMap<>();
+    private final Map<String, Map<IronGolem, Integer>> Guardtime = new HashMap<>();
 
     @EventHandler
     public void onStart(BedwarsGameStartEvent e) {
@@ -92,7 +92,7 @@ public class TeamIronGolem implements Listener {
                 if (e.getItem().getType() == Material.valueOf(Config.items_team_iron_golem_item) && e.getItem().getDurability() == 0) {
                     if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_team_iron_golem_cooldown * 1000) {
                         e.setCancelled(true);
-                        player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_team_iron_golem_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000))) + ""));
+                        player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_team_iron_golem_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
                     } else {
                         ItemStack stack = e.getItem();
                         BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.TEAM_IRON_GOLEM, stack);

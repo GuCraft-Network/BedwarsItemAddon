@@ -8,8 +8,8 @@ public final class UnicodeUtil {
     private static final String pattern = singlePattern + singlePattern + singlePattern + singlePattern;
 
     private static String ustartToCn(final String str) {
-        StringBuilder sb = new StringBuilder().append("0x").append(str.substring(2, 6));
-        Integer codeInteger = Integer.decode(sb.toString());
+        String sb = "0x" + str.substring(2, 6);
+        Integer codeInteger = Integer.decode(sb);
         int code = codeInteger.intValue();
         char c = (char) code;
         return String.valueOf(c);
@@ -38,7 +38,7 @@ public final class UnicodeUtil {
                 sb.append(ustartToCn(tmpStr));
                 i += 6;
             } else {
-                sb.append(str.substring(i, i + 1));
+                sb.append(str.charAt(i));
                 i++;
             }
         }

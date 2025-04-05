@@ -7,7 +7,7 @@ public enum EnumLocale {
 
     private final String name;
 
-    private EnumLocale(String name) {
+    EnumLocale(String name) {
         this.name = name;
     }
 

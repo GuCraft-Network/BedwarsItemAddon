@@ -11,10 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class UpdateCheck implements Listener {
 
@@ -30,7 +27,7 @@ public class UpdateCheck implements Listener {
         String url3 = "https://raw.githubusercontent.com/TheRamU/Update/master/BedwarsItemAddon-English.txt";
         locale_urls.put(EnumLocale.ZH_CN, Arrays.asList(url1, url2));
         locale_urls.put(EnumLocale.ZH_TW, Arrays.asList(url1, url2));
-        locale_urls.put(EnumLocale.EN_US, Arrays.asList(url3));
+        locale_urls.put(EnumLocale.EN_US, Collections.singletonList(url3));
         Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
             if (Config.update_check_enabled) {
                 Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {

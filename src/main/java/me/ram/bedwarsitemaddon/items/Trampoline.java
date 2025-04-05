@@ -98,7 +98,7 @@ public class Trampoline implements Listener {
             if ((e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) && e.getItem().getType() == new ItemStack(Material.valueOf(Config.items_trampoline_item)).getType()) {
                 if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_trampoline_cooldown * 1000) {
                     e.setCancelled(true);
-                    player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_trampoline_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000))) + ""));
+                    player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_trampoline_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
                 } else {
                     ItemStack stack = e.getItem();
                     Location location1 = player.getLocation();
@@ -330,7 +330,7 @@ public class Trampoline implements Listener {
                 vblocks.get(game.getName()).remove(location);
                 blocks.get(game.getName()).remove(location);
             }
-        }.runTaskLater(Main.getInstance(), Config.items_trampoline_staytime * 20);
+        }.runTaskLater(Main.getInstance(), Config.items_trampoline_staytime * 20L);
     }
 
     private boolean isEnoughSpace(Location location1, Location location2) {
