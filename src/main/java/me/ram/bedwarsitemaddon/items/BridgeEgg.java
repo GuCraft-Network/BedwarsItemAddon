@@ -16,7 +16,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Egg;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -39,7 +38,7 @@ public class BridgeEgg implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     public void onInteract(PlayerInteractEvent e) {
         if (!Config.items_bridge_egg_enabled) {
             return;
@@ -58,16 +57,19 @@ public class BridgeEgg implements Listener {
             return;
         }
         e.setCancelled(true);
+
         if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_bridge_egg_cooldown * 1000) {
             e.setCancelled(true);
             player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_bridge_egg_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
+
         BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.BRIDGE_EGG, handItem);
         Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
         if (bedwarsUseItemEvent.isCancelled()) {
             return;
         }
+
         cooldown.put(player, System.currentTimeMillis());
         Egg egg = player.launchProjectile(Egg.class);
         egg.setBounce(false);

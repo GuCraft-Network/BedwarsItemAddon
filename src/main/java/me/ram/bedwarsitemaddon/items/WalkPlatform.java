@@ -67,14 +67,17 @@ public class WalkPlatform implements Listener {
             return;
         }
         e.setCancelled(true);
+
         if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_walk_platform_cooldown * 1000) {
             player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_walk_platform_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
+
         BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.WALK_PLATFORM, handItem);
         if (bedwarsUseItemEvent.isCancelled()) {
             return;
         }
+
         Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
         cooldown.put(player, System.currentTimeMillis());
         if (tasks.get(game.getName()).containsKey(player)) {

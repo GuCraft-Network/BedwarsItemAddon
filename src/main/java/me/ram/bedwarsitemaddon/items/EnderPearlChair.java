@@ -15,7 +15,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -37,7 +36,7 @@ public class EnderPearlChair implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     public void onInteract(PlayerInteractEvent e) {
         if (!Config.items_ender_pearl_chair_enabled) {
             return;
@@ -59,16 +58,18 @@ public class EnderPearlChair implements Listener {
             return;
         }
         e.setCancelled(true);
+
         if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_ender_pearl_chair_cooldown * 1000) {
-            e.setCancelled(true);
             player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_ender_pearl_chair_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
+
         BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.ENDER_PEARL_CHAIR, handItem);
         Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
         if (bedwarsUseItemEvent.isCancelled()) {
             return;
         }
+
         cooldown.put(player, System.currentTimeMillis());
         EnderPearl enderpearl = player.launchProjectile(EnderPearl.class);
         enderpearl.setShooter(player);

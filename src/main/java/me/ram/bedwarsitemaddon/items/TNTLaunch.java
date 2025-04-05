@@ -15,7 +15,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -36,7 +35,7 @@ public class TNTLaunch implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     public void onInteract(PlayerInteractEvent e) {
         if (!Config.items_tnt_launch_enabled) {
             return;
@@ -58,15 +57,18 @@ public class TNTLaunch implements Listener {
             return;
         }
         e.setCancelled(true);
+
         if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_tnt_launch_cooldown * 1000) {
             player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_tnt_launch_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
+
         BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.TNT_LAUNCH, handItem);
         Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
         if (bedwarsUseItemEvent.isCancelled()) {
             return;
         }
+
         cooldown.put(player, System.currentTimeMillis());
         TNTPrimed tnt = player.getWorld().spawn(player.getLocation().clone().add(0, 1, 0), TNTPrimed.class);
         tnt.setYield((float) Config.items_tnt_launch_range);

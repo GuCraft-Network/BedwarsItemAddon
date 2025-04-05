@@ -19,7 +19,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
@@ -77,7 +76,7 @@ public class CompactTower implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
         if (!Config.items_compact_tower_enabled) {
             return;
@@ -99,15 +98,18 @@ public class CompactTower implements Listener {
             return;
         }
         e.setCancelled(true);
+
         if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_compact_tower_cooldown * 1000) {
             player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_compact_tower_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
+
         BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.BRIDGE_EGG, handItem);
         Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
         if (bedwarsUseItemEvent.isCancelled()) {
             return;
         }
+
         cooldown.put(player, System.currentTimeMillis());
         setblock(game, team, e.getBlock().getLocation(), player);
         TakeItemUtil.TakeItem(player, handItem);

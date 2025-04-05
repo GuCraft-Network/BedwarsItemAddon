@@ -92,10 +92,13 @@ public class MagicMilk implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onPlayerItemConsume(PlayerItemConsumeEvent e) {
-        Player player = e.getPlayer();
         if (!Config.items_magic_milk_enabled) {
             return;
         }
+        if (!Bukkit.getPluginManager().isPluginEnabled("BedwarsScoreBoardAddon")) {
+            return;
+        }
+        Player player = e.getPlayer();
         ItemStack item = e.getItem();
         if (item == null || !item.getType().equals(Material.MILK_BUCKET)) {
             return;
@@ -105,9 +108,6 @@ public class MagicMilk implements Listener {
             return;
         }
         e.setCancelled(true);
-        if (!Bukkit.getPluginManager().isPluginEnabled("BedwarsScoreBoardAddon")) {
-            return;
-        }
         if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_magic_milk_cooldown * 1000) {
             player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_magic_milk_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;

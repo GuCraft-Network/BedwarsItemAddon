@@ -41,7 +41,7 @@ public class FireBall implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     public void onInteractFireball(PlayerInteractEvent e) {
         if (!Config.items_fireball_enabled) {
             return;
@@ -63,15 +63,18 @@ public class FireBall implements Listener {
             return;
         }
         e.setCancelled(true);
+
         if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_fireball_cooldown * 1000) {
             player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_fireball_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
+
         BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.FIRE_BALL, handItem);
         Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
         if (bedwarsUseItemEvent.isCancelled()) {
             return;
         }
+
         cooldown.put(player, System.currentTimeMillis());
         Fireball fireball = player.launchProjectile(Fireball.class);
         fireball.setVelocity(fireball.getDirection().multiply(Config.items_fireball_ejection_speed));
