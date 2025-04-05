@@ -59,14 +59,14 @@ public class Main extends JavaPlugin {
     }
 
     public void onEnable() {
-        if (!getDescription().getName().equals("BedwarsItemAddon") || !getDescription().getVersion().equals(getVersion()) || !getDescription().getAuthors().contains("Ram")) {
-            try {
-                new Exception("Please don't edit plugin.yml!").printStackTrace();
-            } catch (Exception ignored) {
-            }
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
+//        if (!getDescription().getName().equals("BedwarsItemAddon") || !getDescription().getVersion().equals(getVersion()) || !getDescription().getAuthors().contains("Ram")) {
+//            try {
+//                new Exception("Please don't edit plugin.yml!").printStackTrace();
+//            } catch (Exception ignored) {
+//            }
+//            Bukkit.getPluginManager().disablePlugin(this);
+//            return;
+//        }
         instance = this;
         noFallManage = new NoFallManage();
         localeConfig = new LocaleConfig();
