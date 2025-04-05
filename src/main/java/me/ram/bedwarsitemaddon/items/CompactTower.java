@@ -79,10 +79,10 @@ public class CompactTower implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onBlockPlace(BlockPlaceEvent e) {
-        Player player = e.getPlayer();
         if (!Config.items_compact_tower_enabled) {
             return;
         }
+        Player player = e.getPlayer();
         ItemStack handItem = e.getItemInHand();
         if (handItem == null || handItem.getType() != Material.valueOf(Config.items_compact_tower_item)) {
             return;

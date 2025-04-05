@@ -42,38 +42,39 @@ public class EnderPearlChair implements Listener {
         if (!Config.items_ender_pearl_chair_enabled) {
             return;
         }
+        Action action = e.getAction();
+        if (action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR) {
+            return;
+        }
         Player player = e.getPlayer();
+        ItemStack handItem = e.getItem();
+        if (handItem == null || handItem.getType() != Material.ENDER_PEARL) {
+            return;
+        }
         Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
-        if (e.getItem() == null || game == null) {
+        if (game == null || game.getState() != GameState.RUNNING || game.isOverSet()) {
             return;
         }
-        if (game.getState() != GameState.RUNNING) {
+        if (game.isSpectator(player) || !game.getPlayers().contains(player)) {
             return;
         }
-        if (!game.getPlayers().contains(player)) {
+        e.setCancelled(true);
+        if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_ender_pearl_chair_cooldown * 1000) {
+            e.setCancelled(true);
+            player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_ender_pearl_chair_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
             return;
         }
-        if (game.getState() == GameState.RUNNING) {
-            if ((e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) && e.getItem().getType() == new ItemStack(Material.ENDER_PEARL).getType()) {
-                if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_ender_pearl_chair_cooldown * 1000) {
-                    e.setCancelled(true);
-                    player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_ender_pearl_chair_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
-                } else {
-                    ItemStack stack = e.getItem();
-                    BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.ENDER_PEARL_CHAIR, stack);
-                    Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
-                    if (!bedwarsUseItemEvent.isCancelled()) {
-                        cooldown.put(player, System.currentTimeMillis());
-                        EnderPearl enderpearl = player.launchProjectile(EnderPearl.class);
-                        enderpearl.setShooter(player);
-                        enderpearl.setPassenger(player);
-                        this.removeEnderPearl(player, enderpearl);
-                        TakeItemUtil.TakeItem(player, stack);
-                    }
-                    e.setCancelled(true);
-                }
-            }
+        BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.ENDER_PEARL_CHAIR, handItem);
+        Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
+        if (bedwarsUseItemEvent.isCancelled()) {
+            return;
         }
+        cooldown.put(player, System.currentTimeMillis());
+        EnderPearl enderpearl = player.launchProjectile(EnderPearl.class);
+        enderpearl.setShooter(player);
+        enderpearl.setPassenger(player);
+        this.removeEnderPearl(player, enderpearl);
+        TakeItemUtil.TakeItem(player, handItem);
     }
 
     public void removeEnderPearl(Player player, EnderPearl enderpearl) {
