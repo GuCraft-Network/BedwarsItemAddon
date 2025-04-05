@@ -144,9 +144,6 @@ public class Utils {
 
     public static boolean isCanPlace(Game game, Location location) {
         Block block = location.getBlock();
-        if (!block.getType().equals(Material.AIR)) {
-            return false;
-        }
         if (!game.getRegion().isInRegion(location)) {
             return false;
         }

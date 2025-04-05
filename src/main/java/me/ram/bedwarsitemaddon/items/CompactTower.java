@@ -75,7 +75,7 @@ public class CompactTower implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
         if (!Config.items_compact_tower_enabled) {
             return;
@@ -116,13 +116,6 @@ public class CompactTower implements Listener {
         cooldown.put(player, System.currentTimeMillis());
         setblock(game, team, e.getBlock().getLocation(), player);
         TakeItemUtil.TakeItem(player, handItem);
-        // 给我整不会了 这可以绕过出生点限制 判断isCancelled也不管用 那只能这么生草了
-        Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
-            if (e.getBlock().getType() != Material.valueOf(Config.items_compact_tower_item)) {
-            }
-
-
-        }, 1L);
     }
 
     public void setblock(Game game, Team team, Location location, Player player) {
@@ -153,7 +146,7 @@ public class CompactTower implements Listener {
                             loc = location.clone().add(z, y, -x);
                         }
                         Block block = loc.getBlock();
-                        if (!Utils.isCanPlace(game, loc)) {
+                        if (loc.getBlock().getType() != Material.AIR || !Utils.isCanPlace(game, loc)) {
                             continue;
                         }
                         try {
