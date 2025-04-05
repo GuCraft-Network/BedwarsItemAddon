@@ -61,6 +61,7 @@ public class FireBall implements Listener {
         if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_fireball_cooldown * 1000) {
             e.setCancelled(true);
             player.sendMessage(Config.message_cooling.replace("{time}", String.format("%.1f", (((Config.items_fireball_cooldown * 1000 - System.currentTimeMillis() + cooldown.getOrDefault(player, (long) 0)) / 1000)))));
+            return;
         }
         BedwarsUseItemEvent bedwarsUseItemEvent = new BedwarsUseItemEvent(game, player, EnumItem.FIRE_BALL, handItem);
         Bukkit.getPluginManager().callEvent(bedwarsUseItemEvent);
