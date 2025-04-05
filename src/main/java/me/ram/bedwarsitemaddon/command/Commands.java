@@ -2,7 +2,6 @@ package me.ram.bedwarsitemaddon.command;
 
 import me.ram.bedwarsitemaddon.Main;
 import me.ram.bedwarsitemaddon.config.Config;
-import me.ram.bedwarsitemaddon.network.UpdateCheck;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,7 +16,7 @@ public class Commands implements CommandExecutor {
                 sender.sendMessage("");
                 sender.sendMessage("§b                     BedwarsItemAddon");
                 sender.sendMessage("");
-                sender.sendMessage("§f  " + Main.getInstance().getLocaleConfig().getLanguage("version") + ": §a" + Main.getVersion());
+                sender.sendMessage("§f  " + Main.getInstance().getLocaleConfig().getLanguage("version") + ": §a" + Main.getInstance().getVersion());
                 sender.sendMessage("");
                 sender.sendMessage("§f  " + Main.getInstance().getLocaleConfig().getLanguage("author") + ": §aRam");
                 sender.sendMessage("");
@@ -27,7 +26,7 @@ public class Commands implements CommandExecutor {
             if (args[0].equalsIgnoreCase("help")) {
                 sender.sendMessage("§f=====================================================");
                 sender.sendMessage("");
-                sender.sendMessage("§b§l BedwarsItemAddon §fv" + Main.getVersion() + "  §7by Ram");
+                sender.sendMessage("§b§l BedwarsItemAddon §fv" + Main.getInstance().getVersion() + "  §7by Ram");
                 sender.sendMessage("");
                 Config.getLanguageList("commands.help").forEach(sender::sendMessage);
                 sender.sendMessage("");
@@ -41,14 +40,6 @@ public class Commands implements CommandExecutor {
                 }
                 Config.loadConfig();
                 sender.sendMessage(Config.getLanguage("commands.message.prefix") + Config.getLanguage("commands.message.reloaded"));
-                return true;
-            }
-            if (args[0].equalsIgnoreCase("upcheck")) {
-                if (!sender.hasPermission("bedwarsitemaddon.updatecheck")) {
-                    sender.sendMessage(Config.getLanguage("commands.message.prefix") + Config.getLanguage("commands.message.no_permission"));
-                    return true;
-                }
-                UpdateCheck.upCheck(sender);
                 return true;
             }
         }

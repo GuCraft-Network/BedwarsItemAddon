@@ -26,9 +26,9 @@ public class Main extends JavaPlugin {
     @Getter
     private LocaleConfig localeConfig;
 
-//    public static String getVersion() {
-//        return "1.7.0";
-//    }
+    public String getVersion() {
+        return getDescription().getVersion();
+    }
 
     @Override
     public FileConfiguration getConfig() {
