@@ -41,7 +41,7 @@ tnt:
   cooldown: 0.0
 
   #爆炸延迟
-  fuse_ticks: 80
+  fuse_ticks: 40
 
   #伤害
   damage: 3

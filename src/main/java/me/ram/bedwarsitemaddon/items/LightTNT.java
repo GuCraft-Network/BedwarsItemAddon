@@ -50,7 +50,7 @@ public class LightTNT implements Listener {
             return;
         }
 
-        // 给我整不会了 可以绕过出生点限制 判断isCancelled也不管用 那只能这么生草了
+        // 给我整不会了 TNT点燃可以绕过出生点限制 判断isCancelled也不管用 那只能这么生草了
         Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
             if (e.getBlock().getType() != Material.TNT) return;
             if ((System.currentTimeMillis() - cooldown.getOrDefault(player, (long) 0)) <= Config.items_tnt_cooldown * 1000) {

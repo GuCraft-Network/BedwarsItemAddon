@@ -41,7 +41,7 @@ tnt:
   cooldown: 0.0
 
   #Explosion delay
-  fuse_ticks: 80
+  fuse_ticks: 40
 
   #Damage value
   damage: 3
