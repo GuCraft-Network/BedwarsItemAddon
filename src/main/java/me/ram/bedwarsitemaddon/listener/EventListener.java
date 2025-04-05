@@ -1,5 +1,10 @@
 package me.ram.bedwarsitemaddon.listener;
 
+import io.github.bedwarsrel.events.BedwarsGameOverEvent;
+import io.github.bedwarsrel.events.BedwarsGameStartedEvent;
+import io.github.bedwarsrel.events.BedwarsPlayerLeaveEvent;
+import me.ram.bedwarsitemaddon.Main;
+import me.ram.bedwarsitemaddon.manage.NoFallManage;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -9,16 +14,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-
-import io.github.bedwarsrel.events.BedwarsGameOverEvent;
-import io.github.bedwarsrel.events.BedwarsGameStartedEvent;
-import io.github.bedwarsrel.events.BedwarsPlayerLeaveEvent;
-import me.ram.bedwarsitemaddon.Main;
-import me.ram.bedwarsitemaddon.manage.NoFallManage;
 
 public class EventListener implements Listener {
 
@@ -53,7 +52,7 @@ public class EventListener implements Listener {
         Main.getInstance().getNoFallManage().removePlayer(e.getEntity());
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onMove(PlayerMoveEvent e) {
         Player player = e.getPlayer();
         Block block = e.getTo().clone().add(0, -1, 0).getBlock();
@@ -72,7 +71,7 @@ public class EventListener implements Listener {
         }, 10L));
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onDamage(EntityDamageEvent e) {
         if (!e.getCause().equals(DamageCause.FALL)) {
             return;
