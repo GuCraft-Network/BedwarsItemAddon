@@ -154,9 +154,6 @@ public class Utils {
             if (!game.isInGame(player) || game.isSpectator(player)) {
                 return false;
             }
-            if (Bukkit.getPluginManager().isPluginEnabled("BedwarsScoreBoardAddon") && BedwarsUtil.isRespawning(player)) {
-                return false;
-            }
         }
         if (Bukkit.getPluginManager().isPluginEnabled("BedwarsScoreBoardAddon")) {
             if (me.ram.bedwarsscoreboardaddon.config.Config.spawn_no_build_spawn_enabled) {
