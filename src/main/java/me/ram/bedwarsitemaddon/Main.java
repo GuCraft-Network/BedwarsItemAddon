@@ -13,6 +13,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.List;
+
 /**
  * @author Ram
  * @version 1.7.0
@@ -73,27 +80,26 @@ public class Main extends JavaPlugin {
         }
     }
 
-    //不要允许飞行了 反作弊被绕的时候我都畏惧了
-//    @Override
-//    public void onLoad() {
-//        try {
-//            // 允许飞行，防止使用道具时踢出服务器
-//            Path path = Paths.get(getDataFolder().getParentFile().getAbsolutePath()).getParent().resolve("server.properties");
-//            boolean reboot = false;
-//            List<String> lines = Files.readAllLines(path);
-//            if (lines.contains("allow-flight=false")) {
-//                lines.remove("allow-flight=false");
-//                lines.add("allow-flight=true");
-//                reboot = true;
-//            }
-//            Files.write(path, lines, StandardOpenOption.TRUNCATE_EXISTING);
-//            if (reboot) {
-//                Bukkit.shutdown();
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    @Override
+    public void onLoad() {
+        try {
+            // 允许飞行，防止使用道具时踢出服务器
+            Path path = Paths.get(getDataFolder().getParentFile().getAbsolutePath()).getParent().resolve("server.properties");
+            boolean reboot = false;
+            List<String> lines = Files.readAllLines(path);
+            if (lines.contains("allow-flight=false")) {
+                lines.remove("allow-flight=false");
+                lines.add("allow-flight=true");
+                reboot = true;
+            }
+            Files.write(path, lines, StandardOpenOption.TRUNCATE_EXISTING);
+            if (reboot) {
+                Bukkit.shutdown();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private void registerEvents() {
         Bukkit.getPluginManager().registerEvents(new EventListener(), this);

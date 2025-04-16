@@ -4,7 +4,6 @@ import io.github.bedwarsrel.BedwarsRel;
 import io.github.bedwarsrel.game.Game;
 import io.github.bedwarsrel.game.ResourceSpawner;
 import io.github.bedwarsrel.game.Team;
-import me.ram.bedwarsscoreboardaddon.utils.BedwarsUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
